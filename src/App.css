@@ -1,0 +1,48 @@
+.grid-container {
+  display: grid;
+  grid-template-rows: 2fr 1fr; /* שורה עליונה גדולה יותר */
+  gap: 10px; /* רווח בין השורות */
+  padding: 20px;
+  height: 100vh; /* גובה מלא של הדף */
+}
+
+.grid-container > * {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.notes-container {
+  grid-row: 1; /* שורה עליונה */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.keyboard-row {
+  grid-row: 2; /* שורה תחתונה */
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr; /* שלוש עמודות: קובייה ריקה, מקלדת, קובייה ריקה */
+  gap: 10px;
+}
+
+.keyboard-row > .Emojis-box {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  background-color: #e0e0e0;
+
+}
+
+.keyboard-row > .empty-box:hover {
+  background-color: #d0d0d0;
+  cursor: pointer;
+}
