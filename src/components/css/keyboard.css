@@ -1,78 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+
 .keyboard {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-top: 30px;
+  gap: 12px; /* Increased gap between rows */
+  margin-top: 40px; /* Increased top margin */
+  width: 100%;
+  max-width: 800px; /* Increased max width */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .key-row {
   display: flex;
-  justify-content: center; /* מרכז את המקשים בשורה */
-  gap: 6px; /* רווח בין המקשים */
-  width: 100%; /* השורה תתפוס את כל הרוחב */
+  justify-content: center;
+  gap: 10px; /* Increased gap between keys */
+  width: 100%;
 }
 
 .key {
-  width: 48px;
-  height: 48px;
+  width: 60px; /* Increased key width */
+  height: 60px; /* Increased key height */
   background-color: #f3f3f3;
   border: 2px solid #ccc;
-  border-radius: 6px;
+  border-radius: 8px; /* Slightly larger border radius */
   text-align: center;
-  line-height: 24px;
-  padding: 4px;
-  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
-  font-family: monospace;
+  line-height: 30px; /* Adjusted line height */
+  padding: 6px; /* Increased padding */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
   display: flex;
   flex-direction: column;
   justify-content: center;
+  font-size: 18px; /* Increased font size */
+}
+
+.key:hover {
+  background-color: #e0e0e0;
+  cursor: pointer;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.key.active {
+  background-color: #ffddc2;
+  border-color: #ffa83f;
+  border-width: 3px; /* Increased border width for active state */
 }
 
 .space-key {
-  width: 300px; /* קבע את הרוחב הרצוי למקש ה-Space */
-  height: 48px; /* שמור על גובה זהה לשאר המקשים */
+  width: 380px; /* Increased space key width */
+  height: 60px; /* Maintaining same height as other keys */
   text-align: center;
   background-color: #e0e0e0;
   border: 2px solid #ccc;
-  border-radius: 6px;
-  padding: 4px;
-  font-size: 16px;
+  border-radius: 8px;
+  padding: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 18px;
 }
 
 .lang-switch-key {
   display: flex;
   background-image: url("https://img.icons8.com/material-sharp/48/itranslate.png");
-  background-size: cover;
+  background-size: 70%; /* Adjusted to show more of the image */
   background-position: center;
+  background-repeat: no-repeat;
 }
 
-.enter-key {
-  width: 100px; 
+.wide-key {
+  width: 120px; /* Increased wide key width */
+  height: 60px; /* Maintaining same height */
   text-align: center;
   background-color: #e0e0e0;
   border: 2px solid #ccc;
-  border-radius: 6px;
-  padding: 4px;
-  font-size: 16px;
+  border-radius: 8px;
+  padding: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.key .en {
-  font-weight: bold;
-}
-
-.key .he {
-  font-size: 0.7em;
-  color: #777;
-}
-
-.key.active {
-  background-color: #c2e7ff;
-  border-color: #2b9ff3;
+  font-size: 18px;
 }

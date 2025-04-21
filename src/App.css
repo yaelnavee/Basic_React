@@ -21,15 +21,13 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
   padding: 10px;
 }
 
 .keyboard-row {
   grid-row: 2; /* שורה תחתונה */
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr; /* שלוש עמודות: קובייה ריקה, מקלדת, קובייה ריקה */
+  grid-template-columns: 1fr 2fr 1fr; /* שלוש עמודות */
   gap: 10px;
 }
 
@@ -38,11 +36,8 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  background-color: #e0e0e0;
-
 }
 
 .keyboard-row > .empty-box:hover {
-  background-color: #d0d0d0;
   cursor: pointer;
 }

@@ -1,0 +1,117 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f8ff;
+    background-image: url("background.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0;
+}
+
+.login-container {
+    width: 700px;
+    min-height: 700px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgb(168, 166, 166);
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.login-title {
+    background-image: url("/tape.png"); 
+    background-size: contain; 
+    background-repeat: no-repeat; 
+    background-position: center; 
+    padding: 50px;
+    font-size: 40px;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.login-form {
+    width: 100%;
+    max-width: 500px;
+}
+
+.login-field {
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.login-field label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.login-input {
+    width: 100%;
+    padding: 15px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+    font-size: 18px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 30px;
+    border: none;
+    border-radius: 20px;
+    background-color: #febf2d;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #d3aa23;
+}
+
+.login-error {
+    color: #ff0000;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.login-switch {
+    margin-top: 25px;
+    color: #333;
+    font-size: 18px;
+}
+
+.login-switch-button {
+    background: none;
+    border: none;
+    color: #febf2d;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    font-size: 18px;
+    margin: 0;
+    width: auto;
+}
+
+.login-switch-button:hover {
+    color: #d3aa23;
+    background: none;
+}

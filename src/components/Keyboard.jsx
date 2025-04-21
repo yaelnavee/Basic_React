@@ -1,64 +1,98 @@
 import React, { useState } from "react"; 
 import "./css/Keyboard.css"; 
-import KeyRow from "./KeyRow";
+import KeyRow from "./KeyRow"; 
 
 const Keyboard = ({ keyPressed }) => {
-    const [activeLanguage, setActiveLanguage] = useState("en"); // שפה פעילה: en, he, או sign
-    // const [activeKey, setActiveKey] = useState(null); 
+    const [activeLanguage, setActiveLanguage] = useState("en"); // שפה פעילה: en, HE, או sign
 
     const rows = [
         [
-            { en: "1", he: "1", sign: "1" }, { en: "2", he: "2", sign: "2" }, { en: "3", he: "3", sign: "3" },
-            { en: "4", he: "4", sign: "4" }, { en: "5", he: "5", sign: "5" }, { en: "6", he: "6", sign: "6" },
-            { en: "7", he: "7", sign: "7" }, { en: "8", he: "8", sign: "8" }, { en: "9", he: "9", sign: "9" },
-            { en: "0", he: "0", sign: "0" }
+            { label: "Del", className: "wide-key" },
+            { label: "1" }, { label: "2" }, { label: "3" },
+            { label: "4" }, { label: "5" }, { label: "6" },
+            { label: "7" }, { label: "8" }, { label: "9" },
+            { label: "0" }
         ],
         [
-            { en: "Tab", he: "Tab", sign: "!" }, { en: "Q", he: "ק", sign: "@" }, { en: "W", he: "ו", sign: "#" },
-            { en: "E", he: "ק", sign: "$" }, { en: "R", he: "ר", sign: "¢"}, { en: "T", he: "א", sign: "£" },
-            { en: "Y", he: "ט", sign: "€"  }, { en: "U", he: "ו", sign: "&" }, { en: "I", he: "ן", sign: "(" },
-            { en: "O", he: "ם", sign: ")" }, { en: "P", he: "פ", sign: "|" }
+            {  label: "Tab", sign: "!" },
+            { EN: "Q", en: "q", HE: "ק", sign: "@" },
+            { EN: "W", en: "w", HE: "ו", sign: "#" },
+            { EN: "E", en: "e", HE: "ק", sign: "$" },
+            { EN: "R", en: "r", HE: "ר", sign: "¢" },
+            { EN: "T", en: "t", HE: "א", sign: "£" },
+            { EN: "Y", en: "y", HE: "ט", sign: "€" },
+            { EN: "U", en: "u", HE: "ו", sign: "&" },
+            { EN: "I", en: "i", HE: "ן", sign: "(" },
+            { EN: "O", en: "o", HE: "ם", sign: ")" },
+            { EN: "P", en: "p", HE: "פ", sign: "|" }
         ],
         [
-            { en: "Caps", he: "Caps", sign: "=" }, { en: "A", he: "ש", sign: "-" }, { en: "S", he: "ד", sign: "+" },
-            { en: "D", he: "ג", sign: "%" }, { en: "F", he: "כ", sign: "*" }, { en: "G", he: "ע", sign: "^" },
-            { en: "H", he: "י", sign: ":" }, { en: "J", he: "ח", sign: ";" }, { en: "K", he: "ל", sign: "{" },
-            { en: "L", he: "ך", sign: "}" }
+            { label: "Cps",  HE: " ", sign: "=", onClick: () => toggCapsLoack() },
+            { EN: "A", en: "a", HE: "ש", sign: "-" },
+            { EN: "S", en: "s", HE: "ד", sign: "+" },
+            { EN: "D", en: "d", HE: "ג", sign: "%" },
+            { EN: "F", en: "f", HE: "כ", sign: "*" },
+            { EN: "G", en: "g", HE: "ע", sign: "^" },
+            { EN: "H", en: "h", HE: "י", sign: ":" },
+            { EN: "J", en: "j", HE: "ח", sign: ";" },
+            { EN: "K", en: "k", HE: "ל", sign: "{" },
+            { EN: "L", en: "l", HE: "ך", sign: "}" }
         ],
         [
-            { en: ",", he: ",", sign: "," }, { en: "Z", he: "ז", sign: "/" }, { en: "X", he: "ס", sign: "\\" }, 
-            { en: "C", he: "ב", sign: "\"" },
-            { en: "V", he: "ה", sign: "<" }, { en: "B", he: "נ", sign: ">" }, { en: "N", he: "מ", sign: "?" },
-            { en: "M", he: "צ", sign: "!" }, { en: ".", he: ".", sign: "." }
+            { label: "," },
+            { EN: "Z", en: "z", HE: "ז", sign: "/" },
+            { EN: "X", en: "x", HE: "ס", sign: "\\" },
+            { EN: "C", en: "c", HE: "ב", sign: "\"" },
+            { EN: "V", en: "v", HE: "ה", sign: "<" },
+            { EN: "B", en: "b", HE: "נ", sign: ">" },
+            { EN: "N", en: "n", HE: "מ", sign: "?" },
+            { EN: "M", en: "m", HE: "צ", sign: "!" },
+            { label: "." }
         ],
         [
-            { en: "", he: "", sign: "", className: "lang-switch-key",  onClick: () => toggleLanguage() }, 
-            { en: "Space", he: "Space", sign: "Space", className: "space-key" },
-            { en: "Enter", he: "Enter", sign: "Enter", className: "enter-key" }
+            { label: "", className: "lang-switch-key",  onClick: () => toggleLanguage() }, 
+            { label: "Space", className: "space-key" },
+            { label: "Enter", className: "wide-key" }
         ],
     ];
 
-    const toggleLanguage = () => {//מחלף לשפה או שפת סימנים
-        if (activeLanguage === "en") {
-            setActiveLanguage("he");
-        } else if (activeLanguage === "he") {
+    const toggleLanguage = () => {
+        if (activeLanguage === "en" || activeLanguage === "EN") {
+            setActiveLanguage("HE");
+        } else if (activeLanguage === "HE") {
             setActiveLanguage("sign");
         } else {
             setActiveLanguage("en");
         }
     };
 
+    const toggCapsLoack = () => {
+        // english letters caps lock
+        if (activeLanguage === "en") {
+            setActiveLanguage("EN");
+        } else if (activeLanguage === "EN") {
+            setActiveLanguage("en");
+        }
+
+        // in sign language, we don't have caps lock, 
+        if (activeLanguage === "sign") {
+            // type "=" to screen. return "="
+            //TODO: add lisiner of key down or somthinfg like that
+            keyPressed("=");
+        }
+        
+    };
 
     return (
         <div className="keyboard">
             {rows.map((keys, index) => (
                 <KeyRow
                  key={index} 
-                keys={keys} 
-                keyPressed={keyPressed} 
-                activeLanguage={activeLanguage} 
-/>
-            ))}
+                 keys={keys} 
+                 keyPressed={keyPressed} 
+                 activeLanguage={activeLanguage} 
+                 />
+                ))}
         </div>
     );
 };
