@@ -84,9 +84,21 @@
   font-size: 14px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: background-color 0.2s;
-  margin: 10px 0;
+  margin: 10px auto;
+  display: block;
+  font-weight: bold;
 }
 
 .add-note-button:hover {
   background-color: #388e3c;
+}
+
+/* קונטיינר לכפתור במרכז העמוד */
+.add-note-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  background-color: #f0f0f0;
+  margin-top: -15px;
 }

@@ -1,0 +1,148 @@
+/* סגנונות לפתק בסיסי */
+.sticky-note {
+    position: relative;
+    width: 200px;
+    min-height: 200px;
+    margin: 10px;
+    border-radius: 5px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .sticky-note:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* צבעים שונים לפתקים - מותאמים לצבעים בתמונות שהועלו */
+  .sticky-note.yellow {
+    background-color: #ffffa3;
+  }
+  
+  .sticky-note.green {
+    background-color: #c9efa1;
+  }
+  
+  .sticky-note.pink {
+    background-color: #ffbcc9;
+  }
+  
+  .sticky-note.blue {
+    background-color: #a3e4ff;
+  }
+  
+  /* תוכן הפתק */
+  .note-content {
+    font-family: 'Arial', 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 170px;
+    padding: 25px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    direction: rtl;
+  }
+  
+  /* כפתור מחיקה */
+  .delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 24px;
+    height: 24px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+  }
+  
+  .delete-button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 0.8);
+  }
+  
+  /* מצב עריכה */
+  .editing-mode {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+  }
+  
+  .editing-mode textarea {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Arial', 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    padding: 10px;
+    min-height: 150px;
+    direction: rtl;
+  }
+  
+  /* סרגל כלים בתחתית הפתק במצב עריכה */
+  .note-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    margin-top: 5px;
+  }
+  
+  /* אפשרויות צבע */
+  .color-options {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .color-option {
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .color-option.yellow {
+    background-color: #ffffa3;
+  }
+  
+  .color-option.green {
+    background-color: #c9efa1;
+  }
+  
+  .color-option.pink {
+    background-color: #ffbcc9;
+  }
+  
+  .color-option.blue {
+    background-color: #a3e4ff;
+  }
+  
+  /* כפתור שמירה */
+  .save-button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #4caf50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .save-button:hover {
+    background-color: #388e3c;
+  }

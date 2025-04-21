@@ -11,7 +11,7 @@ function App() {
   const [username, setUsername] = useState('');
   const [isSigningUp, setIsSigningUp] = useState(false);
   
-  // הוספת ניהול פתקים
+  // ניהול פתקים
   const [notes, setNotes] = useState([]);
   const [nextId, setNextId] = useState(1);
 
@@ -93,13 +93,18 @@ function App() {
           <div className="grid-container">
             {/* שורה עליונה - אזור הפתקים */}
             <div className="notes-container">
-              <div className="user-container" 
-                   style={{ textAlign: "center", marginTop: "10px", width: "100%" }}>
+              
+              {/* מידע על המשתמש */}
+              <div className="user-container" style={{ textAlign: "center", marginTop: "10px", width: "100%" }}>
                 <p>שלום, {username}!</p>
                 <button onClick={handleLogout}>התנתק</button>
-                <button onClick={addNote} className="add-note-button">הוסף פתק חדש +</button>
               </div>
-              
+              {/* כפתור הוספת פתק */}
+              <div className="add-note-container">
+                <button onClick={addNote} className="add-note-button">
+                  + הוסף פתק חדש
+                </button>
+              </div>
               {/* הצגת הפתקים */}
               {notes.map(note => (
                 <StickyNote 
