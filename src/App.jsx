@@ -14,16 +14,107 @@ function App() {
   // ניהול פתקים
   const [notes, setNotes] = useState([]);
   const [nextId, setNextId] = useState(1);
+  
+  // הוספת מצב לפתק נבחר
+  const [selectedNoteId, setSelectedNoteId] = useState(null);
 
-  // האזנה ללחיצות מקלדת
+  // האזנה ללחיצות מקלדת פיזית
   useEffect(() => {
     const handleKeyDown = (event) => {
       setKeyPressed(event.key);
+      
+      // אם יש פתק נבחר, נוסיף את התו למלל של הפתק
+      if (selectedNoteId !== null) {
+        updateSelectedNoteText(event.key);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [selectedNoteId, notes]); // חשוב להוסיף את notes למערך התלויות
+
+  // האזנה לאירועים מהמקלדת הווירטואלית
+  useEffect(() => {
+    const handleVirtualKeyDown = (event) => {
+      // בדיקה שזה אירוע מותאם שלנו (לא מהמקלדת הפיזית)
+      if (event.detail && event.detail.virtual) {
+        const key = event.detail.key;
+        
+        // אם יש פתק נבחר, נוסיף את התו למלל של הפתק
+        if (selectedNoteId !== null) {
+          updateSelectedNoteText(key);
+        }
+      }
+    };
+
+    window.addEventListener('virtualkeydown', handleVirtualKeyDown);
+    return () => window.removeEventListener('virtualkeydown', handleVirtualKeyDown);
+  }, [selectedNoteId, notes]); // חשוב להוסיף את notes למערך התלויות
+
+  // פונקציה לעדכון טקסט בפתק הנבחר
+  const updateSelectedNoteText = (key) => {
+    if (!selectedNoteId) return;
+
+    // מצא את הפתק הנבחר
+    const selectedNote = notes.find(note => note.id === selectedNoteId);
+    if (!selectedNote) return;
+
+    // הטקסט הנוכחי בפתק
+    let currentText = selectedNote.text || '';
+    let newText = currentText;
+
+    // טיפול במקרים מיוחדים
+    switch (key) {
+      case 'Backspace':
+      case 'Del':
+        newText = currentText.slice(0, -1); // מחיקת התו האחרון
+        break;
+      case 'Enter':
+        newText = currentText + '\n'; // הוספת ירידת שורה
+        break;
+      case 'Space':
+        newText = currentText + ' '; // הוספת רווח
+        break;
+      case 'Tab':
+        newText = currentText + '\t'; // הוספת טאב
+        break;
+      default:
+        // בדיקה שזה תו בודד שניתן להוסיף לטקסט
+        if (key.length === 1) {
+          newText = currentText + key; // הוספת התו לסוף הטקסט הקיים
+        }
+        break;
+    }
+
+    // אם הטקסט השתנה, עדכן את הפתק
+    if (newText !== currentText) {
+      updateNote(selectedNoteId, { text: newText });
+    }
+  };
+
+  // טיפול בלחיצה על אימוג'י
+  const handleEmojiClick = (emoji) => {
+    if (selectedNoteId !== null) {
+      // מצא את הפתק הנבחר
+      const selectedNote = notes.find(note => note.id === selectedNoteId);
+      if (!selectedNote) return;
+  
+      // הוסף את האימוג'י לטקסט הקיים
+      const newText = (selectedNote.text || '') + emoji;
+      
+      // עדכון הפתק
+      updateNote(selectedNoteId, { text: newText });
+    }
+  };
+
+  // טיפול בלחיצה על מקש וירטואלי
+  const handleVirtualKeyPress = (key) => {
+    // הפעלת אירוע מותאם עבור המקלדת הווירטואלית
+    const customEvent = new CustomEvent('virtualkeydown', { 
+      detail: { key, virtual: true } 
+    });
+    window.dispatchEvent(customEvent);
+  };
 
   // טעינת הפתקים מה-Local Storage כשמשתמש מתחבר
   useEffect(() => {
@@ -36,11 +127,17 @@ function App() {
         // מציאת ה-ID הגבוה ביותר כדי להמשיך מספור
         const maxId = Math.max(...parsedNotes.map(note => note.id), 0);
         setNextId(maxId + 1);
+        
+        // בחירת הפתק הראשון כברירת מחדל (אם יש פתקים)
+        if (parsedNotes.length > 0) {
+          setSelectedNoteId(parsedNotes[0].id);
+        }
       } else {
-        setNotes([
-          { id: 1, text: '', color: 'yellow' }
-        ]);
+        // יצירת פתק ראשון אם אין
+        const firstNote = { id: 1, text: '', color: 'yellow' };
+        setNotes([firstNote]);
         setNextId(2);
+        setSelectedNoteId(1); // בחירת הפתק הראשון
       }
     }
   }, [isAuthenticated, username]);
@@ -61,22 +158,38 @@ function App() {
     setIsAuthenticated(false);
     setUsername('');
     setNotes([]);
+    setSelectedNoteId(null);
   };
 
   // הוספת פתק חדש
   const addNote = () => {
+    const newId = nextId;
     const newNote = {
-      id: nextId,
+      id: newId,
       text: '',
       color: 'yellow'
     };
     setNotes([...notes, newNote]);
     setNextId(nextId + 1);
+    
+    // בחירה אוטומטית של הפתק החדש
+    setSelectedNoteId(newId);
   };
 
   // מחיקת פתק
   const deleteNote = (id) => {
     setNotes(notes.filter(note => note.id !== id));
+    
+    // אם הפתק הנמחק הוא הפתק הנבחר, נבחר פתק אחר
+    if (selectedNoteId === id) {
+      // חפש את הפתק הקודם או הבא ברשימה
+      const remainingNotes = notes.filter(note => note.id !== id);
+      if (remainingNotes.length > 0) {
+        setSelectedNoteId(remainingNotes[0].id);
+      } else {
+        setSelectedNoteId(null);
+      }
+    }
   };
 
   // עדכון פתק
@@ -84,6 +197,11 @@ function App() {
     setNotes(notes.map(note => 
       note.id === id ? { ...note, ...updatedData } : note
     ));
+  };
+
+  // בחירת פתק
+  const selectNote = (id) => {
+    setSelectedNoteId(id);
   };
 
   return (
@@ -114,14 +232,16 @@ function App() {
                   initialColor={note.color}
                   onDelete={deleteNote}
                   onUpdate={updateNote}
+                  isSelected={note.id === selectedNoteId}
+                  onSelect={() => selectNote(note.id)}
                 />
               ))}
             </div>
             
             {/* שורה תחתונה - מקלדת ואמוג'ים */}
             <div className="keyboard-row">
-              <EmojisBox />
-              <Keyboard keyPressed={keyPressed} />
+              <EmojisBox onEmojiClick={handleEmojiClick} />
+              <Keyboard onKeyPress={handleVirtualKeyPress} />
               <div className="Fonts-box">Fonts</div>
               <div className="Colors-box">Colors</div>
             </div>

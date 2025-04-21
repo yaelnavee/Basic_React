@@ -16,7 +16,14 @@
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   }
   
-  /* צבעים שונים לפתקים - מותאמים לצבעים בתמונות שהועלו */
+  /* סגנון לפתק נבחר */
+.sticky-note.selected {
+    border: 2px solid #4caf50;
+    box-shadow: 0 0 8px #4caf50;
+    transform: scale(1.02);
+  }
+
+  /* צבעים שונים לפתקים */
   .sticky-note.yellow {
     background-color: #ffffa3;
   }

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./css/Keyboard.css"; 
 import KeyRow from "./KeyRow"; 
 
-const Keyboard = ({ keyPressed }) => {
+const Keyboard = ({ onKeyPress }) => {
     const [activeLanguage, setActiveLanguage] = useState("en"); // שפה פעילה: en, HE, או sign
 
     const rows = [
@@ -27,7 +27,7 @@ const Keyboard = ({ keyPressed }) => {
             { EN: "P", en: "p", HE: "פ", sign: "|" }
         ],
         [
-            { label: "Cps",  HE: " ", sign: "=", onClick: () => toggCapsLoack() },
+            { label: "Cps",  HE: " ", sign: "=", onClick: () => toggleCapsLock() },
             { EN: "A", en: "a", HE: "ש", sign: "-" },
             { EN: "S", en: "s", HE: "ד", sign: "+" },
             { EN: "D", en: "d", HE: "ג", sign: "%" },
@@ -66,7 +66,7 @@ const Keyboard = ({ keyPressed }) => {
         }
     };
 
-    const toggCapsLoack = () => {
+    const toggleCapsLock = () => {
         // english letters caps lock
         if (activeLanguage === "en") {
             setActiveLanguage("EN");
@@ -76,23 +76,29 @@ const Keyboard = ({ keyPressed }) => {
 
         // in sign language, we don't have caps lock, 
         if (activeLanguage === "sign") {
-            // type "=" to screen. return "="
-            //TODO: add lisiner of key down or somthinfg like that
-            keyPressed("=");
+            // type "=" to screen
+            handleKeyPress("=");
         }
-        
+    };
+
+    // פונקציה לטיפול בלחיצה על מקש
+    const handleKeyPress = (keyValue) => {
+        // קריאה לפונקציה שהועברה מהאפליקציה
+        if (onKeyPress) {
+            onKeyPress(keyValue);
+        }
     };
 
     return (
         <div className="keyboard">
             {rows.map((keys, index) => (
                 <KeyRow
-                 key={index} 
-                 keys={keys} 
-                 keyPressed={keyPressed} 
-                 activeLanguage={activeLanguage} 
-                 />
-                ))}
+                    key={index} 
+                    keys={keys} 
+                    onKeyPress={handleKeyPress}
+                    activeLanguage={activeLanguage} 
+                />
+            ))}
         </div>
     );
 };

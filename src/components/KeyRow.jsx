@@ -1,11 +1,16 @@
 import React from "react";
 
-const KeyRow = ({ keys, activeLanguage }) => {
-    const handleKeyClick = (keyValue) => {
-        if (keyValue) {
-            // יצירת אירוע של לחיצה על מקש
-            const event = new KeyboardEvent("keydown", { key: keyValue });
-            window.dispatchEvent(event); // הפעלת האירוע
+const KeyRow = ({ keys, activeLanguage, onKeyPress }) => {
+    const handleKeyClick = (keyValue, customHandler) => {
+        // אם יש פונקציית טיפול מותאמת אישית, נפעיל אותה
+        if (customHandler) {
+            customHandler();
+            return;
+        }
+        
+        // אחרת, נקרא לפונקציה שהועברה מהמקלדת
+        if (keyValue && onKeyPress) {
+            onKeyPress(keyValue);
             console.log(`Key pressed: ${keyValue}`); // הדפסת המקש שנלחץ
         }
     };
@@ -16,7 +21,7 @@ const KeyRow = ({ keys, activeLanguage }) => {
                 <div
                     key={index}
                     className={`key ${key.className || ""}`}
-                    onClick={key.onClick || (() => handleKeyClick(key[activeLanguage] || key.label))} // עטיפה בפונקציה אנונימית
+                    onClick={() => handleKeyClick(key[activeLanguage] || key.label, key.onClick)}
                 >
                     {key[activeLanguage] || key.label} {/* הצגת הערך לפי השפה הפעילה */}
                 </div>

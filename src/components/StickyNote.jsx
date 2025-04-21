@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './css/StickyNote.css'; 
 
-const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate }) => {
+const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelected, onSelect }) => {
   const [text, setText] = useState(initialText || '');
   const [color, setColor] = useState(initialColor || 'yellow');
   const [isEditing, setIsEditing] = useState(false);
@@ -9,6 +9,16 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate }) => {
   // טיפול בלחיצה כפולה לפתיחת הפתק לעריכה
   const handleDoubleClick = () => {
     setIsEditing(true);
+    if (onSelect) {
+      onSelect(id);
+    }
+  };
+  
+  // טיפול בלחיצה על הפתק - בחירת הפתק
+  const handleClick = () => {
+    if (onSelect) {
+      onSelect(id);
+    }
   };
 
   // שמירת הטקסט ויציאה ממצב עריכה
@@ -28,22 +38,36 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate }) => {
   };
 
   // מחיקת הפתק
-  const handleDelete = () => {
+  const handleDelete = (e) => {
+    e.stopPropagation(); // מניעת בחירת הפתק בעת לחיצה על כפתור המחיקה
     if (onDelete) {
       onDelete(id);
     }
   };
 
+  // עדכון טקסט מהחוץ
+  // הערה: אם הטקסט ישתנה מבחוץ (מהמקלדת הווירטואלית או האימוג'ים),
+  // נשתמש ב-useEffect לעדכן את state המקומי
+  React.useEffect(() => {
+    setText(initialText || '');
+  }, [initialText]);
+
   return (
     <div 
-      className={`sticky-note ${color}`} 
+      className={`sticky-note ${color} ${isSelected ? 'selected' : ''}`} 
       onDoubleClick={handleDoubleClick}
+      onClick={handleClick}
     >
       {isEditing ? (
         <div className="editing-mode">
           <textarea
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => {
+              setText(e.target.value);
+              if (onUpdate) {
+                onUpdate(id, { text: e.target.value, color });
+              }
+            }}
             autoFocus
           />
           <div className="note-toolbar">
