@@ -243,32 +243,39 @@ function App() {
           <div className="grid-container">
             {/* שורה עליונה - אזור הפתקים */}
             <div className="notes-container">
+              {/* סרגל צד עם פרטי משתמש וכפתור הוספת פתק */}
+              <div className="sidebar">
+                <div className="user-container">
+                  <p>hey, {username}!</p>
+                  <button onClick={handleLogout}>logout</button>
+                </div>
+                
+                <div className="add-note-container">
+                  <button onClick={addNote} className="add-note-button">
+                    + add new note
+                  </button>
+                </div>
+              </div>
               
-              <div className="user-container" style={{ textAlign: "center", marginTop: "10px", width: "100%" }}>
-                <p>שלום, {username}!</p>
-                <button onClick={handleLogout}>התנתק</button>
+              {/* אזור תצוגת הפתקים */}
+              <div className="notes-display-area">
+                {notes.map(note => (
+                  <StickyNote 
+                    key={note.id}
+                    id={note.id}
+                    initialText={note.text}
+                    initialColor={note.color}
+                    onDelete={deleteNote}
+                    onUpdate={updateNote}
+                    onEditEnd={() => handleNoteEditEnd(note.id)}
+                    isSelected={note.id === selectedNoteId}
+                    onSelect={() => selectNote(note.id)}
+                  />
+                ))}
               </div>
-              <div className="add-note-container">
-                <button onClick={addNote} className="add-note-button">
-                  + הוסף פתק חדש
-                </button>
-              </div>
-              {notes.map(note => (
-                <StickyNote 
-                  key={note.id}
-                  id={note.id}
-                  initialText={note.text}
-                  initialColor={note.color}
-                  onDelete={deleteNote}
-                  onUpdate={updateNote}
-                  onEditEnd={() => handleNoteEditEnd(note.id)}
-                  isSelected={note.id === selectedNoteId}
-                  onSelect={() => selectNote(note.id)}
-                />
-              ))}
             </div>
             
-            {/* שורה תחתונה - מקלדת ואמוג'ים */}
+            {/* שורה תחתונה - אזור הכלים */}
             <div className="keyboard-row">
               <EmojisBox onEmojiClick={handleEmojiClick} />
               <Keyboard onKeyPress={handleVirtualKeyPress} />

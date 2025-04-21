@@ -1,95 +1,48 @@
+.app-container {
+  width: 100%;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* Main grid container */
 .grid-container {
   display: grid;
   grid-template-rows: 2fr 1fr;
   gap: 20px;
   padding: 20px;
   height: 100vh;
+  box-sizing: border-box;
 }
 
-.grid-container > * {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  display: flex;
-  align-items: flex-start; /* שינוי ל-flex-start כדי שפתקים יתחילו מלמעלה */
-  justify-content: center;
-  font-size: 16px;
-}
-
+/* Notes area - taking the full first row */
 .notes-container {
   grid-row: 1;
   display: grid;
-  grid-template-columns: 15% 85%;
+  grid-template-columns: 200px 1fr; /* סרגל צד קבוע, אזור פתקים גמיש */
   gap: 20px;
   background-color: transparent;
   border: none;
+  overflow: hidden;
 }
 
-.sticky-notes {
-  background-color: white;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  display: flex;
-  flex-wrap: wrap;
-<<<<<<< HEAD
-  justify-content: flex-start;
-  align-items: flex-start;
-  height: 100%;
-}
-
-.user-container {
-  background-color: white;
-  border: 2px solid #ccc;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+/* Sidebar with user info */
+.sidebar {
+  grid-column: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  height: 100%;
-=======
-  justify-content: flex-start; /* שינוי כדי שהפתקים יתחילו משמאל */
-  align-items: flex-start; /* שינוי כדי שהפתקים יתחילו מלמעלה */
-  padding: 10px;
-  overflow-y: auto; /* אפשר לגלול אם יש יותר מדי פתקים */
->>>>>>> 21209493b46ee4d141497be89f058fbda64a0780
+  gap: 20px;
 }
 
-.keyboard-row {
-  grid-row: 2;
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  gap: 10px;
-  background-color: white;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-.keyboard-row > .Emojis-box {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-}
-
-.keyboard-row > .empty-box:hover {
-  cursor: pointer;
-}
-
-/* סגנונות חדשים לפתקים */
+/* User info container */
 .user-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
-  padding: 10px;
+  padding: 15px;
   background-color: #e3f2fd;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: fit-content;
 }
 
 .user-container p {
@@ -102,40 +55,169 @@
   padding: 6px 12px;
   border: none;
   border-radius: 4px;
+  background-color: #e95d53;
+  color: white;
   cursor: pointer;
   font-size: 14px;
+  transition: background-color 0.2s;
 }
 
 .user-container button:hover {
-  opacity: 0.9;
+  background-color: #e94646;
 }
 
-/* כפתור הוספת פתק */
+/* Add note button container */
+.add-note-container {
+  width: 100%;
+  text-align: center;
+}
+
 .add-note-button {
-  background-color: #4caf50;
+  background-color: #70e05c;
   color: white;
   border: none;
-  padding: 8px 15px;
+  padding: 10px 15px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: background-color 0.2s;
-  margin: 10px auto;
-  display: block;
   font-weight: bold;
+  width: 100%;
 }
 
 .add-note-button:hover {
-  background-color: #388e3c;
+  background-color: #9f9931;
 }
 
-/* קונטיינר לכפתור במרכז העמוד */
-.add-note-container {
+/* Notes display area */
+.notes-display-area {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 15px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+}
+
+/* Keyboard row styling */
+.keyboard-row {
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 1fr;
+  gap: 10px;
+  background-color: white;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+/* Sticky note styling */
+.sticky-note {
+  min-width: 150px;
+  min-height: 150px;
+  margin: 10px;
+  padding: 15px;
+  position: relative;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  border-radius: 5px;
+}
+
+.sticky-note.selected {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.sticky-note .close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.sticky-note .close-button:hover {
+  opacity: 1;
+}
+
+.sticky-note textarea {
   width: 100%;
+  height: calc(100% - 20px);
+  border: none;
+  background: transparent;
+  resize: none;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-size: 14px;
+}
+
+.sticky-note textarea:focus {
+  outline: none;
+}
+
+/* Colors for sticky notes */
+.sticky-note.yellow {
+  background-color: #fff387;
+}
+
+.sticky-note.pink {
+  background-color: #faadc6;
+}
+
+.sticky-note.blue {
+  background-color: #a0defa;
+}
+
+.sticky-note.green {
+  background-color: #b9f0bb;
+}
+
+.sticky-note.purple {
+  background-color: #ce93d8;
+}
+
+/* Fonts and Colors boxes */
+.Fonts-box, .Colors-box {
   display: flex;
   justify-content: center;
-  padding: 10px 0;
-  background-color: #f0f0f0;
-  margin-top: -15px;
+  align-items: center;
+  font-weight: bold;
+  color: #555;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .notes-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  
+  .sidebar {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  
+  .notes-display-area {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  
+  .keyboard-row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 10px;
+  }
 }
