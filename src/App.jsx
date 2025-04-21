@@ -37,15 +37,17 @@ function App() {
           <div className="grid-container">
             {/* שורה עליונה */}
             <div className="notes-container">
-            <div className="user-container" 
-            style={{ textAlign: "center", marginTop: "10px" }}>
-            <p>Welcome, {username}!</p>
-            <button onClick={handleLogout}>Logout</button>
-            </div>
-              <StickyNote />
-              <StickyNote />
-              <StickyNote />
-            </div>
+              <div className="user-container" 
+              style={{ textAlign: "center", marginTop: "10px" }}>
+              <p>Welcome, {username}!</p>
+              <button onClick={handleLogout}>Logout</button>
+              </div>
+              <div className="sticky-notes">
+                <StickyNote />
+                <StickyNote />
+                <StickyNote />
+              </div>
+            </div >
             {/* שורה תחתונה */}
             <div className="keyboard-row">
               <EmojisBox />

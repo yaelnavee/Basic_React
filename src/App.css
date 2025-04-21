@@ -1,9 +1,9 @@
 .grid-container {
   display: grid;
-  grid-template-rows: 2fr 1fr; /* שורה עליונה גדולה יותר */
-  gap: 10px; /* רווח בין השורות */
+  grid-template-rows: 2fr 1fr;
+  gap: 20px;
   padding: 20px;
-  height: 100vh; /* גובה מלא של הדף */
+  height: 100vh;
 }
 
 .grid-container > * {
@@ -16,19 +16,50 @@
 }
 
 .notes-container {
-  grid-row: 1; /* שורה עליונה */
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: 15% 85%;
+  gap: 20px;
+  background-color: transparent;
+  border: none;
+}
+
+.sticky-notes {
+  background-color: white;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.user-container {
+  background-color: white;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
-  padding: 10px;
+  height: 100%;
 }
 
 .keyboard-row {
-  grid-row: 2; /* שורה תחתונה */
+  grid-row: 2;
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr; /* שלוש עמודות */
+  grid-template-columns: 1fr 2fr 1fr;
   gap: 10px;
+  background-color: white;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
 }
 
 .keyboard-row > .Emojis-box {
