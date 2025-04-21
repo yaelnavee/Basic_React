@@ -52,6 +52,17 @@
     direction: rtl;
   }
   
+  /* עיצוב סמן */
+.cursor {
+    display: inline-block;
+    width: 2px;
+    height: 18px;
+    background-color: #000;
+    margin-right: 2px;
+    animation: blink 1s infinite;
+    vertical-align: middle;
+  }
+  
   /* כפתור מחיקה */
   .delete-button {
     position: absolute;

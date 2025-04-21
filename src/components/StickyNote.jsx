@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './css/StickyNote.css'; 
 
-const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelected, onSelect }) => {
+const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelected, onSelect, onEditEnd }) => {
   const [text, setText] = useState(initialText || '');
   const [color, setColor] = useState(initialColor || 'yellow');
   const [isEditing, setIsEditing] = useState(false);
-
+  const textareaRef = useRef(null);
+  
   // טיפול בלחיצה כפולה לפתיחת הפתק לעריכה
   const handleDoubleClick = () => {
     setIsEditing(true);
@@ -27,6 +28,11 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
     if (onUpdate) {
       onUpdate(id, { text, color });
     }
+    
+    // קריאה לפונקציית סיום העריכה
+    if (onEditEnd) {
+      onEditEnd(id);
+    }
   };
 
   // שינוי צבע הפתק
@@ -46,11 +52,29 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
   };
 
   // עדכון טקסט מהחוץ
-  // הערה: אם הטקסט ישתנה מבחוץ (מהמקלדת הווירטואלית או האימוג'ים),
-  // נשתמש ב-useEffect לעדכן את state המקומי
-  React.useEffect(() => {
+  useEffect(() => {
     setText(initialText || '');
   }, [initialText]);
+  
+  // התמקדות בטקסטאריה כאשר הפתק נבחר או במצב עריכה
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isEditing]);
+  
+  // יצירת ייצוג ויזואלי של הטקסט עם סמן
+  const renderTextWithCursor = () => {
+    if (!isSelected || isEditing) return text;
+    
+    // הוספת אלמנט הסמן לסוף הטקסט
+    return (
+      <>
+        {text}
+        <span className="cursor"></span>
+      </>
+    );
+  };
 
   return (
     <div 
@@ -61,6 +85,7 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
       {isEditing ? (
         <div className="editing-mode">
           <textarea
+            ref={textareaRef}
             value={text}
             onChange={(e) => {
               setText(e.target.value);
@@ -94,7 +119,7 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
         </div>
       ) : (
         <>
-          <div className="note-content">{text}</div>
+          <div className="note-content">{renderTextWithCursor()}</div>
           <button className="delete-button" onClick={handleDelete}>×</button>
         </>
       )}

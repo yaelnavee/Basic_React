@@ -17,6 +17,8 @@ function App() {
   
   // הוספת מצב לפתק נבחר
   const [selectedNoteId, setSelectedNoteId] = useState(null);
+  // מעקב אחר הפתק האחרון שעודכן
+  const [lastUpdatedId, setLastUpdatedId] = useState(null);
 
   // האזנה ללחיצות מקלדת פיזית
   useEffect(() => {
@@ -31,7 +33,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedNoteId, notes]); // חשוב להוסיף את notes למערך התלויות
+  }, [selectedNoteId, notes]); 
 
   // האזנה לאירועים מהמקלדת הווירטואלית
   useEffect(() => {
@@ -49,17 +51,35 @@ function App() {
 
     window.addEventListener('virtualkeydown', handleVirtualKeyDown);
     return () => window.removeEventListener('virtualkeydown', handleVirtualKeyDown);
-  }, [selectedNoteId, notes]); // חשוב להוסיף את notes למערך התלויות
+  }, [selectedNoteId, notes]); 
+
+  // סדר מחדש את הפתקים כך שהפתק האחרון שעודכן יהיה ראשון
+  useEffect(() => {
+    if (lastUpdatedId !== null && lastUpdatedId !== selectedNoteId) {
+      reorderNotes(lastUpdatedId);
+      setLastUpdatedId(null);
+    }
+  }, [selectedNoteId, lastUpdatedId]);
+
+  // פונקציה לסידור מחדש של הפתקים
+  const reorderNotes = (noteId) => {
+    const updatedNote = notes.find(note => note.id === noteId);
+    if (!updatedNote) return;
+
+    // הסר את הפתק מהמערך הנוכחי
+    const otherNotes = notes.filter(note => note.id !== noteId);
+    
+    // הוסף את הפתק המעודכן לתחילת המערך
+    setNotes([updatedNote, ...otherNotes]);
+  };
 
   // פונקציה לעדכון טקסט בפתק הנבחר
   const updateSelectedNoteText = (key) => {
     if (!selectedNoteId) return;
 
-    // מצא את הפתק הנבחר
     const selectedNote = notes.find(note => note.id === selectedNoteId);
     if (!selectedNote) return;
 
-    // הטקסט הנוכחי בפתק
     let currentText = selectedNote.text || '';
     let newText = currentText;
 
@@ -67,49 +87,47 @@ function App() {
     switch (key) {
       case 'Backspace':
       case 'Del':
-        newText = currentText.slice(0, -1); // מחיקת התו האחרון
+        newText = currentText.slice(0, -1); 
         break;
       case 'Enter':
-        newText = currentText + '\n'; // הוספת ירידת שורה
+        newText = currentText + '\n'; 
         break;
       case 'Space':
-        newText = currentText + ' '; // הוספת רווח
+        newText = currentText + ' '; 
         break;
       case 'Tab':
-        newText = currentText + '\t'; // הוספת טאב
+        newText = currentText + '\t'; 
         break;
       default:
-        // בדיקה שזה תו בודד שניתן להוסיף לטקסט
         if (key.length === 1) {
-          newText = currentText + key; // הוספת התו לסוף הטקסט הקיים
+          newText = currentText + key; 
         }
         break;
     }
 
-    // אם הטקסט השתנה, עדכן את הפתק
     if (newText !== currentText) {
       updateNote(selectedNoteId, { text: newText });
+      // הפתק האחרון שעודכן
+      setLastUpdatedId(selectedNoteId);
     }
   };
 
   // טיפול בלחיצה על אימוג'י
   const handleEmojiClick = (emoji) => {
     if (selectedNoteId !== null) {
-      // מצא את הפתק הנבחר
       const selectedNote = notes.find(note => note.id === selectedNoteId);
       if (!selectedNote) return;
   
-      // הוסף את האימוג'י לטקסט הקיים
       const newText = (selectedNote.text || '') + emoji;
       
-      // עדכון הפתק
       updateNote(selectedNoteId, { text: newText });
+      // הפתק האחרון שעודכן
+      setLastUpdatedId(selectedNoteId);
     }
   };
 
   // טיפול בלחיצה על מקש וירטואלי
   const handleVirtualKeyPress = (key) => {
-    // הפעלת אירוע מותאם עבור המקלדת הווירטואלית
     const customEvent = new CustomEvent('virtualkeydown', { 
       detail: { key, virtual: true } 
     });
@@ -137,7 +155,7 @@ function App() {
         const firstNote = { id: 1, text: '', color: 'yellow' };
         setNotes([firstNote]);
         setNextId(2);
-        setSelectedNoteId(1); // בחירת הפתק הראשון
+        setSelectedNoteId(1); 
       }
     }
   }, [isAuthenticated, username]);
@@ -159,6 +177,7 @@ function App() {
     setUsername('');
     setNotes([]);
     setSelectedNoteId(null);
+    setLastUpdatedId(null);
   };
 
   // הוספת פתק חדש
@@ -169,7 +188,9 @@ function App() {
       text: '',
       color: 'yellow'
     };
-    setNotes([...notes, newNote]);
+    
+    // הוסף את הפתק החדש לתחילת הרשימה
+    setNotes([newNote, ...notes]);
     setNextId(nextId + 1);
     
     // בחירה אוטומטית של הפתק החדש
@@ -190,6 +211,11 @@ function App() {
         setSelectedNoteId(null);
       }
     }
+
+    // אם הפתק הנמחק הוא הפתק האחרון שעודכן, נאפס את המצב
+    if (lastUpdatedId === id) {
+      setLastUpdatedId(null);
+    }
   };
 
   // עדכון פתק
@@ -197,6 +223,12 @@ function App() {
     setNotes(notes.map(note => 
       note.id === id ? { ...note, ...updatedData } : note
     ));
+  };
+
+  // כאשר משתמש יוצא ממצב עריכה של פתק
+  const handleNoteEditEnd = (id) => {
+    // סמן את הפתק כאחרון שעודכן
+    setLastUpdatedId(id);
   };
 
   // בחירת פתק
@@ -212,18 +244,15 @@ function App() {
             {/* שורה עליונה - אזור הפתקים */}
             <div className="notes-container">
               
-              {/* מידע על המשתמש */}
               <div className="user-container" style={{ textAlign: "center", marginTop: "10px", width: "100%" }}>
                 <p>שלום, {username}!</p>
                 <button onClick={handleLogout}>התנתק</button>
               </div>
-              {/* כפתור הוספת פתק */}
               <div className="add-note-container">
                 <button onClick={addNote} className="add-note-button">
                   + הוסף פתק חדש
                 </button>
               </div>
-              {/* הצגת הפתקים */}
               {notes.map(note => (
                 <StickyNote 
                   key={note.id}
@@ -232,6 +261,7 @@ function App() {
                   initialColor={note.color}
                   onDelete={deleteNote}
                   onUpdate={updateNote}
+                  onEditEnd={() => handleNoteEditEnd(note.id)}
                   isSelected={note.id === selectedNoteId}
                   onSelect={() => selectNote(note.id)}
                 />
