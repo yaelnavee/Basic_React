@@ -1,3 +1,4 @@
+/* CSS modifications */
 .emojis-box {
     display: flex;
     flex-wrap: wrap;
@@ -7,13 +8,66 @@
     border: 2px solid #ddd;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    max-width: 600px; /* Increased from 400px */
+    max-width: 600px;
     margin: 0 auto;
     justify-content: center;
+    
+    /* Add these properties for the scrollbar functionality */
+    max-height: 400px; /* Fixed height to ensure consistency */
+    overflow-y: auto; /* Add vertical scrollbar when needed */
+    overflow-x: hidden; /* Hide horizontal scrollbar */
 }
 
+/* Make the scrollbar look nicer */
+.emojis-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.emojis-box::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.emojis-box::-webkit-scrollbar-thumb {
+    background: #cccccc;
+    border-radius: 3px;
+}
+
+.emojis-box::-webkit-scrollbar-thumb:hover {
+    background: #aaaaaa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .emojis-box {
+        max-width: 90%;
+        padding: 15px;
+    }
+    
+    .emoji-item {
+        font-size: 24px; /* Slightly smaller on mobile */
+        width: 50px;
+        height: 70px;
+    }
+}
+
+
+@media (max-width: 400px) {
+    .emojis-box {
+        gap: 8px;
+        padding: 12px;
+    }
+    
+    .emoji-item {
+        font-size: 22px;
+        width: 45px;
+        height: 65px;
+    }
+}
+
+
 .emoji-item {
-    font-size: 28px; /* Increased font size */
+    font-size: 28px;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     width: 60px;

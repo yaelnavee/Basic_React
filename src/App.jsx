@@ -20,12 +20,10 @@ function App() {
   // מעקב אחר הפתק האחרון שעודכן
   const [lastUpdatedId, setLastUpdatedId] = useState(null);
 
-  // האזנה ללחיצות מקלדת פיזית
   useEffect(() => {
     const handleKeyDown = (event) => {
       setKeyPressed(event.key);
       
-      // אם יש פתק נבחר, נוסיף את התו למלל של הפתק
       if (selectedNoteId !== null) {
         updateSelectedNoteText(event.key);
       }
@@ -35,14 +33,11 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedNoteId, notes]); 
 
-  // האזנה לאירועים מהמקלדת הווירטואלית
   useEffect(() => {
     const handleVirtualKeyDown = (event) => {
-      // בדיקה שזה אירוע מותאם שלנו (לא מהמקלדת הפיזית)
       if (event.detail && event.detail.virtual) {
         const key = event.detail.key;
         
-        // אם יש פתק נבחר, נוסיף את התו למלל של הפתק
         if (selectedNoteId !== null) {
           updateSelectedNoteText(key);
         }
@@ -53,7 +48,6 @@ function App() {
     return () => window.removeEventListener('virtualkeydown', handleVirtualKeyDown);
   }, [selectedNoteId, notes]); 
 
-  // סדר מחדש את הפתקים כך שהפתק האחרון שעודכן יהיה ראשון
   useEffect(() => {
     if (lastUpdatedId !== null && lastUpdatedId !== selectedNoteId) {
       reorderNotes(lastUpdatedId);
@@ -61,19 +55,13 @@ function App() {
     }
   }, [selectedNoteId, lastUpdatedId]);
 
-  // פונקציה לסידור מחדש של הפתקים
   const reorderNotes = (noteId) => {
     const updatedNote = notes.find(note => note.id === noteId);
     if (!updatedNote) return;
-
-    // הסר את הפתק מהמערך הנוכחי
     const otherNotes = notes.filter(note => note.id !== noteId);
-    
-    // הוסף את הפתק המעודכן לתחילת המערך
-    setNotes([updatedNote, ...otherNotes]);
+        setNotes([updatedNote, ...otherNotes]);
   };
 
-  // פונקציה לעדכון טקסט בפתק הנבחר
   const updateSelectedNoteText = (key) => {
     if (!selectedNoteId) return;
 
@@ -83,7 +71,6 @@ function App() {
     let currentText = selectedNote.text || '';
     let newText = currentText;
 
-    // טיפול במקרים מיוחדים
     switch (key) {
       case 'Backspace':
       case 'Del':
@@ -107,12 +94,10 @@ function App() {
 
     if (newText !== currentText) {
       updateNote(selectedNoteId, { text: newText });
-      // הפתק האחרון שעודכן
       setLastUpdatedId(selectedNoteId);
     }
   };
 
-  // טיפול בלחיצה על אימוג'י
   const handleEmojiClick = (emoji) => {
     if (selectedNoteId !== null) {
       const selectedNote = notes.find(note => note.id === selectedNoteId);
@@ -121,12 +106,10 @@ function App() {
       const newText = (selectedNote.text || '') + emoji;
       
       updateNote(selectedNoteId, { text: newText });
-      // הפתק האחרון שעודכן
       setLastUpdatedId(selectedNoteId);
     }
   };
 
-  // טיפול בלחיצה על מקש וירטואלי
   const handleVirtualKeyPress = (key) => {
     const customEvent = new CustomEvent('virtualkeydown', { 
       detail: { key, virtual: true } 
@@ -134,7 +117,6 @@ function App() {
     window.dispatchEvent(customEvent);
   };
 
-  // טעינת הפתקים מה-Local Storage כשמשתמש מתחבר
   useEffect(() => {
     if (isAuthenticated && username) {
       const savedNotes = localStorage.getItem(`stickyNotes_${username}`);
@@ -142,11 +124,9 @@ function App() {
         const parsedNotes = JSON.parse(savedNotes);
         setNotes(parsedNotes);
         
-        // מציאת ה-ID הגבוה ביותר כדי להמשיך מספור
         const maxId = Math.max(...parsedNotes.map(note => note.id), 0);
         setNextId(maxId + 1);
         
-        // בחירת הפתק הראשון כברירת מחדל (אם יש פתקים)
         if (parsedNotes.length > 0) {
           setSelectedNoteId(parsedNotes[0].id);
         }

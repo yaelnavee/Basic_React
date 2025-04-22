@@ -200,24 +200,104 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .grid-container {
+    grid-template-rows: 5fr 2fr; /* יותר מקום לפתקים, פחות למקלדת */
+    height: 100vh;
+    gap: 10px;
+    padding: 10px;
+    overflow: hidden;
+  }
+
   .notes-container {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
-  }
-  
-  .sidebar {
-    grid-column: 1;
-    grid-row: 1;
-  }
-  
-  .notes-display-area {
-    grid-column: 1;
-    grid-row: 2;
-  }
-  
-  .keyboard-row {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
     gap: 10px;
+    min-height: 0; /* חשוב בשביל overflow */
+  }
+
+  .notes-display-area {
+    grid-row: 2;
+    overflow-y: auto;
+    min-height: 0; /* חשוב בשביל overflow */
+    max-height: 100%;
+    padding: 5px;
+  }
+
+  .keyboard-row {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 5px;
+    padding: 5px;
+    max-height: 30vh; /* הגבלת גובה המקלדת */
+  }
+
+  .keyboard-component {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+    max-height: 15vh; /* הגבלת גובה המקלדת עצמה */
+  }
+
+  /* התאמת גודל הפתקים */
+  .sticky-note {
+    min-width: 140px;
+    min-height: 140px;
+    margin: 5px;
+    padding: 10px;
+  }
+
+  /* התאמת הסרגל הצדדי */
+  .sidebar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    height: auto;
+  }
+
+  .user-container {
+    flex: 0 1 auto;
+  }
+
+  .add-note-container {
+    flex: 0 1 auto;
+    margin-left: 10px;
   }
 }
+
+/* מסכים קטנים מאוד */
+@media (max-width: 480px) {
+  .grid-container {
+    grid-template-rows: 4fr 2fr; /* עוד יותר מקום לפתקים */
+    padding: 5px;
+  }
+
+  .sticky-note {
+    min-width: 120px;
+    min-height: 120px;
+    margin: 3px;
+    padding: 8px;
+  }
+
+  .keyboard-row {
+    max-height: 25vh;
+  }
+
+  .keyboard-component {
+    max-height: 12vh;
+  }
+
+  .sidebar {
+    padding: 3px;
+  }
+
+  .user-container button,
+  .add-note-button {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+}
+
+
+
+
+
