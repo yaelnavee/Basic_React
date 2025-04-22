@@ -1,10 +1,15 @@
-//Responsible for the logic of managing all notes together.
-
 import React, { useState, useEffect } from 'react';
 import StickyNote from './StickyNote.jsx';
 
 // Using a custom hook approach instead of a component
-const useNotesManager = ({ username, isAuthenticated, selectedNoteId, setSelectedNoteId, lastUpdatedId, setLastUpdatedId }) => {
+const useNotesManager = ({ 
+  username, 
+  isAuthenticated, 
+  selectedNoteId, 
+  setSelectedNoteId, 
+  lastUpdatedId, 
+  setLastUpdatedId 
+}) => {
   // State for notes management
   const [notes, setNotes] = useState([]);
   const [nextId, setNextId] = useState(1);
@@ -14,24 +19,35 @@ const useNotesManager = ({ username, isAuthenticated, selectedNoteId, setSelecte
     if (isAuthenticated && username) {
       const savedNotes = localStorage.getItem(`stickyNotes_${username}`);
       if (savedNotes) {
-        const parsedNotes = JSON.parse(savedNotes);
-        setNotes(parsedNotes);
-        
-        const maxId = Math.max(...parsedNotes.map(note => note.id), 0);
-        setNextId(maxId + 1);
-        
-        if (parsedNotes.length > 0) {
-          setSelectedNoteId(parsedNotes[0].id);
+        try {
+          const parsedNotes = JSON.parse(savedNotes);
+          setNotes(parsedNotes);
+          
+          const maxId = Math.max(...parsedNotes.map(note => note.id), 0);
+          setNextId(maxId + 1);
+          
+          if (parsedNotes.length > 0) {
+            setSelectedNoteId(parsedNotes[0].id);
+          }
+        } catch (error) {
+          console.error("Error parsing saved notes:", error);
+          // Create first note if parsing failed
+          createFirstNote();
         }
       } else {
         // Create first note if none exists
-        const firstNote = { id: 1, text: '', color: 'yellow' };
-        setNotes([firstNote]);
-        setNextId(2);
-        setSelectedNoteId(1); 
+        createFirstNote();
       }
     }
   }, [isAuthenticated, username, setSelectedNoteId]);
+
+  // Helper function to create a first note
+  const createFirstNote = () => {
+    const firstNote = { id: 1, text: '', color: 'yellow' };
+    setNotes([firstNote]);
+    setNextId(2);
+    setSelectedNoteId(1);
+  };
 
   // Save notes to localStorage whenever they change
   useEffect(() => {
@@ -70,6 +86,60 @@ const useNotesManager = ({ username, isAuthenticated, selectedNoteId, setSelecte
     
     // Automatically select the new note
     setSelectedNoteId(newId);
+  };
+
+  // Load a note from a file
+  const loadNoteFromFile = (noteData) => {
+    if (!noteData || typeof noteData !== 'object') {
+      console.error("Invalid note data:", noteData);
+      return;
+    }
+
+    const newId = nextId;
+    const newNote = {
+      id: newId,
+      text: noteData.text || '',
+      color: noteData.color || 'yellow'
+    };
+    
+    // Add the loaded note to the beginning of the list
+    setNotes([newNote, ...notes]);
+    setNextId(nextId + 1);
+    
+    // Automatically select the new note
+    setSelectedNoteId(newId);
+  };
+
+  // Save a note to a file
+  const saveNoteToFile = (fileName, noteData) => {
+    if (!isAuthenticated || !username) {
+      console.error("User not authenticated");
+      return false;
+    }
+
+    if (!fileName || !noteData) {
+      console.error("Invalid file name or note data");
+      return false;
+    }
+
+    try {
+      // Create a storage key with the prefix for this user
+      const storageKey = `noteFiles_${username}_${fileName}`;
+      
+      // Create a clean copy of the note data to store - containing ONLY text and color
+      const cleanNoteData = {
+        text: noteData.text || '',
+        color: noteData.color || 'yellow'
+      };
+      
+      // Store the clean note data
+      localStorage.setItem(storageKey, JSON.stringify(cleanNoteData));
+      
+      return true;
+    } catch (error) {
+      console.error("Error saving note to file:", error);
+      return false;
+    }
   };
 
   // Delete a note
@@ -172,14 +242,16 @@ const useNotesManager = ({ username, isAuthenticated, selectedNoteId, setSelecte
 
   return {
     notes,
-    setNotes, // Export setNotes for direct updates when loading from file
+    setNotes,
     addNote,
     deleteNote,
     updateNote,
     selectNote,
     handleNoteEditEnd,
     updateSelectedNoteText,
-    handleEmojiClick
+    handleEmojiClick,
+    loadNoteFromFile,
+    saveNoteToFile
   };
 };
 

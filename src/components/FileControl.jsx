@@ -1,127 +1,114 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './css/FileControl.css';
 
-const FileControl = ({ 
-  files, 
-  currentFileName, 
-  onSave, 
-  onSaveAs, 
-  onOpen, 
-  onDelete 
-}) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isFileListOpen, setIsFileListOpen] = useState(false);
-  const [newFileName, setNewFileName] = useState('');
-  const [showSaveAsDialog, setShowSaveAsDialog] = useState(false);
+const FileControl = ({ onLoadNote, username, currentNote }) => {
+  const [savedFiles, setSavedFiles] = useState([]);
+  const [showLoadDialog, setShowLoadDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Prefix for file storage
+  const FILE_STORAGE_PREFIX = `noteFiles_${username}_`;
   
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-    // Close file list when toggling menu
-    if (isFileListOpen) setIsFileListOpen(false);
-  };
-  
-  const toggleFileList = () => {
-    setIsFileListOpen(!isFileListOpen);
-  };
-  
-  const handleSave = () => {
-    if (currentFileName) {
-      // If we already have a file name, save to that file
-      onSave(currentFileName);
-    } else {
-      // Otherwise show the Save As dialog
-      setShowSaveAsDialog(true);
+  // Load the list of saved files for this user
+  useEffect(() => {
+    if (username) {
+      loadSavedFilesList();
     }
-    setIsMenuOpen(false);
-  };
-  
-  const handleSaveAs = () => {
-    setShowSaveAsDialog(true);
-    setIsMenuOpen(false);
-  };
-  
-  const handleSaveAsSubmit = () => {
-    if (newFileName.trim()) {
-      onSaveAs(newFileName.trim());
-      setNewFileName('');
-      setShowSaveAsDialog(false);
+  }, [username]);
+
+  const loadSavedFilesList = () => {
+    const files = [];
+    // Iterate through localStorage to find all saved files for this user
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(FILE_STORAGE_PREFIX)) {
+        // Extract the actual file name from the storage key
+        const fileName = key.replace(FILE_STORAGE_PREFIX, '');
+        files.push(fileName);
+      }
     }
+    setSavedFiles(files);
   };
-  
-  const handleOpen = (fileName) => {
-    onOpen(fileName);
-    setIsFileListOpen(false);
-    setIsMenuOpen(false);
+
+  const handleLoadClick = () => {
+    setShowLoadDialog(true);
+    loadSavedFilesList(); // Refresh the list when opening the dialog
+    setErrorMessage('');
   };
-  
-  const handleDelete = (fileName, e) => {
-    e.stopPropagation(); // Prevent opening the file when clicking delete
+
+  const handleLoad = (selectedFileName) => {
+    const fullKey = FILE_STORAGE_PREFIX + selectedFileName;
+    const fileContent = localStorage.getItem(fullKey);
     
-    if (window.confirm(`האם אתה בטוח שברצונך למחוק את הקובץ "${fileName}"?`)) {
-      onDelete(fileName);
+    if (fileContent) {
+      try {
+        const noteData = JSON.parse(fileContent);
+        // Ensure the noteData has the expected structure
+        if (typeof noteData === 'object') {
+          const formattedNote = {
+            text: noteData.text || '',
+            color: noteData.color || 'yellow'
+          };
+          
+          onLoadNote(formattedNote);
+          setShowLoadDialog(false);
+          setErrorMessage('');
+        } else {
+          throw new Error('Invalid note format');
+        }
+      } catch (error) {
+        console.error('Error parsing file:', error);
+        setErrorMessage('The file is corrupted or in invalid format');
+      }
+    } else {
+      setErrorMessage('Could not load the selected file');
     }
   };
-  
+
+  const handleDelete = (selectedFileName, event) => {
+    // Stop propagation to prevent loading the file when clicking delete
+    event.stopPropagation();
+    
+    if (window.confirm(`Are you sure you want to delete "${selectedFileName}"?`)) {
+      const fullKey = FILE_STORAGE_PREFIX + selectedFileName;
+      localStorage.removeItem(fullKey);
+      loadSavedFilesList(); // Refresh the list
+    }
+  };
+
   return (
     <div className="file-control">
-      <button className="file-menu-button" onClick={toggleMenu}>
-        קובץ
-      </button>
-      
-      {isMenuOpen && (
-        <div className="file-menu">
-          <button onClick={handleSave}>שמירה</button>
-          <button onClick={handleSaveAs}>שמירה בשם</button>
-          <button onClick={toggleFileList}>פתיחה</button>
-        </div>
-      )}
-      
-      {isFileListOpen && (
-        <div className="file-list">
-          <h3>רשימת קבצים</h3>
-          {files.length === 0 ? (
-            <p>אין קבצים שמורים</p>
-          ) : (
-            <ul>
-              {files.map((fileName) => (
-                <li key={fileName} onClick={() => handleOpen(fileName)}>
-                  <span className="file-name">{fileName}</span>
+      <div className="file-buttons">
+        <button className="file-button" onClick={handleLoadClick}>
+          Load Note
+        </button>
+      </div>
+
+      {/* Load Dialog */}
+      {showLoadDialog && (
+        <div className="file-dialog">
+          <h3>Load Note</h3>
+          {savedFiles.length > 0 ? (
+            <div className="files-list">
+              {savedFiles.map((file, index) => (
+                <div key={index} className="file-item">
+                  <span onClick={() => handleLoad(file)}>{file}</span>
                   <button 
                     className="delete-file" 
-                    onClick={(e) => handleDelete(fileName, e)}
+                    onClick={(e) => handleDelete(file, e)}
                   >
-                    מחק
+                    ×
                   </button>
-                </li>
+                </div>
               ))}
-            </ul>
-          )}
-        </div>
-      )}
-      
-      {showSaveAsDialog && (
-        <div className="save-as-dialog">
-          <div className="save-as-content">
-            <h3>שמירה בשם</h3>
-            <input 
-              type="text" 
-              value={newFileName} 
-              onChange={(e) => setNewFileName(e.target.value)} 
-              placeholder="הזן שם קובץ"
-            />
-            <div className="save-as-buttons">
-              <button onClick={handleSaveAsSubmit}>שמור</button>
-              <button onClick={() => setShowSaveAsDialog(false)}>ביטול</button>
             </div>
+          ) : (
+            <p>No saved files found</p>
+          )}
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+          <div className="dialog-buttons">
+            <button onClick={() => setShowLoadDialog(false)}>Close</button>
           </div>
-        </div>
-      )}
-      
-      {currentFileName && (
-        <div className="current-file">
-          <span title={currentFileName}>
-            קובץ נוכחי: {currentFileName}
-          </span>
         </div>
       )}
     </div>

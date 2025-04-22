@@ -90,6 +90,30 @@
   background-color: #9f9931;
 }
 
+/* File control container */
+.file-control-container {
+  width: 100%;
+  margin-top: 15px;
+}
+
+/* Modified file button for load-only */
+.file-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+  width: 100%;
+  text-align: center;
+}
+
+.file-button:hover {
+  background-color: #45a049;
+}
+
 /* Notes display area */
 .notes-display-area {
   grid-column: 2;
@@ -258,7 +282,7 @@
     flex: 0 1 auto;
   }
 
-  .add-note-container {
+  .add-note-container, .file-control-container {
     flex: 0 1 auto;
     margin-left: 10px;
   }
@@ -291,13 +315,9 @@
   }
 
   .user-container button,
-  .add-note-button {
+  .add-note-button,
+  .file-button {
     padding: 4px 6px;
     font-size: 12px;
   }
 }
-
-
-
-
-

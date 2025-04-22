@@ -3,6 +3,7 @@ import StickyNote from './components/StickyNote.jsx';
 import Keyboard from './components/Keyboard.jsx'; 
 import EmojisBox from './components/EmojisBox.jsx';
 import Login from "./components/login.jsx";
+import FileControl from "./components/FileControl.jsx";
 import { useNotesManager } from './components/NotesManager.jsx';
 import './App.css';
 
@@ -25,7 +26,9 @@ function App() {
     selectNote,
     handleNoteEditEnd,
     updateSelectedNoteText,
-    handleEmojiClick
+    handleEmojiClick,
+    loadNoteFromFile,
+    saveNoteToFile
   } = useNotesManager({
     username,
     isAuthenticated,
@@ -34,6 +37,12 @@ function App() {
     lastUpdatedId,
     setLastUpdatedId
   });
+
+  // Get the currently selected note
+  const getCurrentNote = () => {
+    if (selectedNoteId === null) return null;
+    return notes.find(note => note.id === selectedNoteId) || null;
+  };
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -82,6 +91,16 @@ function App() {
     setLastUpdatedId(null);
   };
 
+  // Handler for loading a note from a file
+  const handleLoadNote = (noteData) => {
+    loadNoteFromFile(noteData);
+  };
+
+  // Handler for saving a note to a file
+  const handleSaveNote = (fileName, noteData) => {
+    return saveNoteToFile(fileName, noteData);
+  };
+
   return (
     <div className="app-container">
       {isAuthenticated ? (
@@ -101,6 +120,15 @@ function App() {
                     + add new note
                   </button>
                 </div>
+                
+                {/* File Control Component */}
+                <div className="file-control-container">
+                  <FileControl 
+                    onLoadNote={handleLoadNote}
+                    username={username}
+                    currentNote={getCurrentNote()}
+                  />
+                </div>
               </div>
               
               {/* Notes display area */}
@@ -116,6 +144,7 @@ function App() {
                     onEditEnd={() => handleNoteEditEnd(note.id)}
                     isSelected={note.id === selectedNoteId}
                     onSelect={() => selectNote(note.id)}
+                    onSaveNote={handleSaveNote}
                   />
                 ))}
               </div>
