@@ -1,7 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './css/StickyNote.css'; 
 
-const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelected, onSelect, onEditEnd, onSaveNote }) => {
+const StickyNote = ({ 
+  id, 
+  initialText, 
+  initialColor, 
+  onDelete, 
+  onUpdate, 
+  isSelected, 
+  onSelect, 
+  onEditEnd, 
+  onSaveNote,
+  onSaveDialogOpen,
+  onSaveDialogClose
+}) => {
   const [text, setText] = useState(initialText || '');
   const [color, setColor] = useState(initialColor || 'yellow');
   const [isEditing, setIsEditing] = useState(false);
@@ -13,6 +25,8 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
   
   // טיפול בלחיצה כפולה לפתיחת הפתק לעריכה
   const handleDoubleClick = () => {
+    if (showSaveDialog) return; // לא לפתוח עריכה אם דיאלוג פתוח
+    
     setIsEditing(true);
     if (onSelect) {
       onSelect(id);
@@ -21,6 +35,8 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
   
   // טיפול בלחיצה על הפתק - בחירת הפתק
   const handleClick = () => {
+    if (showSaveDialog) return; // לא לבחור אם דיאלוג פתוח
+    
     if (onSelect) {
       onSelect(id);
     }
@@ -58,16 +74,54 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
   // פתיחת דיאלוג שמירה
   const handleSaveClick = (e) => {
     e.stopPropagation(); // מניעת בחירת הפתק בעת לחיצה על כפתור השמירה
+    
+    // בטל בחירה של הפתק בזמן שדיאלוג השמירה פתוח
+    if (isSelected && onSelect) {
+      onSelect(null);
+    }
+    
+    // הודע לאפליקציה שדיאלוג השמירה פתוח
+    if (onSaveDialogOpen) {
+      onSaveDialogOpen();
+    }
+    
     setShowSaveDialog(true);
-    setFileName('');
+    
+    // יצירת שם קובץ מחדל מהטקסט בפתק
+    if (text) {
+      const defaultName = text.trim().split(/\s+/).slice(0, 3).join('_');
+      if (defaultName) {
+        setFileName(defaultName);
+      } else {
+        setFileName(`note_${id}`);
+      }
+    } else {
+      setFileName(`note_${id}`);
+    }
+    
     setErrorMessage('');
+  };
+
+  // סגירת דיאלוג השמירה
+  const closeSaveDialog = () => {
+    setShowSaveDialog(false);
+    
+    // הודע לאפליקציה שדיאלוג השמירה נסגר
+    if (onSaveDialogClose) {
+      onSaveDialogClose();
+    }
+    
+    // החזר את הבחירה לפתק
+    if (onSelect) {
+      onSelect(id);
+    }
   };
 
   // סגירת דיאלוג בלחיצה מחוץ לדיאלוג
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (saveDialogRef.current && !saveDialogRef.current.contains(event.target)) {
-        setShowSaveDialog(false);
+        closeSaveDialog();
       }
     };
 
@@ -102,7 +156,7 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
       const success = onSaveNote(fileName, noteDataToSave);
       
       if (success) {
-        setShowSaveDialog(false);
+        closeSaveDialog();
         setFileName('');
         setErrorMessage('');
       } else {
@@ -125,9 +179,9 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
   
   // יצירת ייצוג ויזואלי של הטקסט עם סמן
   const renderTextWithCursor = () => {
-    if (!isSelected || isEditing) return text;
+    if (!isSelected || isEditing || showSaveDialog) return text;
     
-    // הוספת אלמנט הסמן לסוף הטקסט
+    // הוספת אלמנט הסמן לסוף הטקסט רק אם הפתק נבחר ואין דיאלוג פתוח
     return (
       <>
         {text}
@@ -138,7 +192,7 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
 
   return (
     <div 
-      className={`sticky-note ${color} ${isSelected ? 'selected' : ''}`} 
+      className={`sticky-note ${color} ${isSelected && !showSaveDialog ? 'selected' : ''}`} 
       onDoubleClick={handleDoubleClick}
       onClick={handleClick}
     >
@@ -173,16 +227,20 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
                 className="color-option blue" 
                 onClick={() => handleColorChange('blue')}
               ></button>
+              <button 
+                className="color-option purple" 
+                onClick={() => handleColorChange('purple')}
+              ></button>
             </div>
-            <button className="save-button" onClick={handleSave}>שמור</button>
+            <button className="save-button" onClick={handleSave}>Save</button>
           </div>
         </div>
       ) : (
         <>
           <div className="note-content">{renderTextWithCursor()}</div>
           <div className="note-buttons">
-            <button className="save-note-button" onClick={handleSaveClick}>💾</button>
-            <button className="delete-button" onClick={handleDelete}>×</button>
+            <button className="save-note-button" onClick={handleSaveClick} title="Save note to file">💾</button>
+            <button className="delete-button" onClick={handleDelete} title="Delete note">×</button>
           </div>
         </>
       )}
@@ -193,7 +251,7 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
           className="note-save-dialog-overlay"
           onClick={(e) => {
             e.stopPropagation();
-            setShowSaveDialog(false);
+            closeSaveDialog();
           }}
         >
           <div 
@@ -209,14 +267,18 @@ const StickyNote = ({ id, initialText, initialColor, onDelete, onUpdate, isSelec
                 value={fileName}
                 onChange={(e) => setFileName(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
+                autoFocus
               />
               {errorMessage && <p className="error-message">{errorMessage}</p>}
               <div className="dialog-buttons">
                 <button type="submit">Save</button>
-                <button type="button" onClick={(e) => {
-                  e.stopPropagation();
-                  setShowSaveDialog(false);
-                }}>
+                <button 
+                  type="button" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeSaveDialog();
+                  }}
+                >
                   Cancel
                 </button>
               </div>

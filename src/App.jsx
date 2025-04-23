@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import StickyNote from './components/StickyNote.jsx';
 import Keyboard from './components/Keyboard.jsx'; 
 import EmojisBox from './components/EmojisBox.jsx';
@@ -16,6 +16,9 @@ function App() {
   // State for notes management
   const [selectedNoteId, setSelectedNoteId] = useState(null);
   const [lastUpdatedId, setLastUpdatedId] = useState(null);
+  
+  // State to track if a save dialog is open
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
   // Use our StickyNotes hook
   const {
@@ -46,6 +49,9 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
+      // אם יש דיאלוג שמירה פתוח, לא לעדכן את הפתק
+      if (isSaveDialogOpen) return;
+      
       setKeyPressed(event.key);
       
       if (selectedNoteId !== null) {
@@ -55,10 +61,13 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedNoteId, updateSelectedNoteText]); 
+  }, [selectedNoteId, updateSelectedNoteText, isSaveDialogOpen]); 
 
   useEffect(() => {
     const handleVirtualKeyDown = (event) => {
+      // אם יש דיאלוג שמירה פתוח, לא לעדכן את הפתק
+      if (isSaveDialogOpen) return;
+      
       if (event.detail && event.detail.virtual) {
         const key = event.detail.key;
         
@@ -70,9 +79,12 @@ function App() {
 
     window.addEventListener('virtualkeydown', handleVirtualKeyDown);
     return () => window.removeEventListener('virtualkeydown', handleVirtualKeyDown);
-  }, [selectedNoteId, updateSelectedNoteText]); 
+  }, [selectedNoteId, updateSelectedNoteText, isSaveDialogOpen]); 
 
   const handleVirtualKeyPress = (key) => {
+    // אם יש דיאלוג שמירה פתוח, לא לשלוח אירועי מקלדת
+    if (isSaveDialogOpen) return;
+    
     const customEvent = new CustomEvent('virtualkeydown', { 
       detail: { key, virtual: true } 
     });
@@ -94,11 +106,6 @@ function App() {
   // Handler for loading a note from a file
   const handleLoadNote = (noteData) => {
     loadNoteFromFile(noteData);
-  };
-
-  // Handler for saving a note to a file
-  const handleSaveNote = (fileName, noteData) => {
-    return saveNoteToFile(fileName, noteData);
   };
 
   return (
@@ -125,6 +132,7 @@ function App() {
                 <div className="file-control-container">
                   <FileControl 
                     onLoadNote={handleLoadNote}
+                    onSaveNote={saveNoteToFile}
                     username={username}
                     currentNote={getCurrentNote()}
                   />
@@ -143,8 +151,18 @@ function App() {
                     onUpdate={updateNote}
                     onEditEnd={() => handleNoteEditEnd(note.id)}
                     isSelected={note.id === selectedNoteId}
-                    onSelect={() => selectNote(note.id)}
-                    onSaveNote={handleSaveNote}
+                    onSelect={(id) => {
+                      // אם מקבלים null מהפתק, סימן שדיאלוג השמירה פתוח
+                      if (id === null) {
+                        setIsSaveDialogOpen(true);
+                      } else {
+                        setIsSaveDialogOpen(false);
+                        selectNote(id);
+                      }
+                    }}
+                    onSaveNote={saveNoteToFile}
+                    onSaveDialogOpen={() => setIsSaveDialogOpen(true)}
+                    onSaveDialogClose={() => setIsSaveDialogOpen(false)}
                   />
                 ))}
               </div>
