@@ -73,7 +73,7 @@ const StickyNote = ({
 
   // פתיחת דיאלוג שמירה
   const handleSaveClick = (e) => {
-    e.stopPropagation(); // מניעת בחירת הפתק בעת לחיצה על כפתור השמירה
+    e.stopPropagation(); // מניעת בחירת הפתק בלחיצה על כפתור השמירה
     
     // בטל בחירה של הפתק בזמן שדיאלוג השמירה פתוח
     if (isSelected && onSelect) {
