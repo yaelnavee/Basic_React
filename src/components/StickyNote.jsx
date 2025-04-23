@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import './css/StickyNote.css'; 
 
 const StickyNote = ({ 
@@ -14,128 +14,96 @@ const StickyNote = ({
   onSaveDialogOpen,
   onSaveDialogClose
 }) => {
+  // מצב הפתק
   const [text, setText] = useState(initialText || '');
   const [color, setColor] = useState(initialColor || 'yellow');
   const [isEditing, setIsEditing] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [fileName, setFileName] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  
+  // רפרנסים
   const textareaRef = useRef(null);
   const saveDialogRef = useRef(null);
   
-  // טיפול בלחיצה כפולה לפתיחת הפתק לעריכה
-  const handleDoubleClick = () => {
-    if (showSaveDialog) return; // לא לפתוח עריכה אם דיאלוג פתוח
-    
-    setIsEditing(true);
-    if (onSelect) {
-      onSelect(id);
-    }
+  
+  // עדכון טקסט אם השתנה מבחוץ
+  if (initialText !== undefined && initialText !== text) {
+    setText(initialText);
+  }
+  
+  // בחירת פתק
+  const handleClick = () => {
+    if (showSaveDialog) return;
+    onSelect?.(id);
   };
   
-  // טיפול בלחיצה על הפתק - בחירת הפתק
-  const handleClick = () => {
-    if (showSaveDialog) return; // לא לבחור אם דיאלוג פתוח
-    
-    if (onSelect) {
-      onSelect(id);
-    }
+  // עריכת פתק
+  const handleDoubleClick = () => {
+    if (showSaveDialog) return;
+    setIsEditing(true);
+    onSelect?.(id);
+    setTimeout(() => textareaRef.current?.focus(), 10);
   };
-
-  // שמירת הטקסט ויציאה ממצב עריכה
+  
+  // שמירת שינויים בפתק
   const handleSave = () => {
     setIsEditing(false);
-    if (onUpdate) {
-      onUpdate(id, { text, color });
-    }
-    
-    // קריאה לפונקציית סיום העריכה
-    if (onEditEnd) {
-      onEditEnd(id);
-    }
+    onUpdate?.(id, { text, color });
+    onEditEnd?.(id);
   };
-
+  
   // שינוי צבע הפתק
   const handleColorChange = (newColor) => {
     setColor(newColor);
-    if (onUpdate) {
-      onUpdate(id, { text, color: newColor });
-    }
+    onUpdate?.(id, { text, color: newColor });
   };
-
-  // מחיקת הפתק
+  
+  // מחיקת פתק
   const handleDelete = (e) => {
-    e.stopPropagation(); // מניעת בחירת הפתק בעת לחיצה על כפתור המחיקה
-    if (onDelete) {
-      onDelete(id);
-    }
+    e.stopPropagation();
+    onDelete?.(id);
   };
-
+  
   // פתיחת דיאלוג שמירה
   const handleSaveClick = (e) => {
-    e.stopPropagation(); // מניעת בחירת הפתק בלחיצה על כפתור השמירה
+    e.stopPropagation();
     
-    // בטל בחירה של הפתק בזמן שדיאלוג השמירה פתוח
-    if (isSelected && onSelect) {
-      onSelect(null);
-    }
-    
-    // הודע לאפליקציה שדיאלוג השמירה פתוח
-    if (onSaveDialogOpen) {
-      onSaveDialogOpen();
-    }
-    
+    if (isSelected) onSelect?.(null);
+    onSaveDialogOpen?.();
     setShowSaveDialog(true);
     
-    // יצירת שם קובץ מחדל מהטקסט בפתק
-    if (text) {
-      const defaultName = text.trim().split(/\s+/).slice(0, 3).join('_');
-      if (defaultName) {
-        setFileName(defaultName);
-      } else {
-        setFileName(`note_${id}`);
-      }
-    } else {
-      setFileName(`note_${id}`);
-    }
-    
+    // קביעת שם קובץ ברירת מחדל
+    const defaultName = text ? text.trim().split(/\s+/).slice(0, 3).join('_') || `note_${id}` : `note_${id}`;
+    setFileName(defaultName);
     setErrorMessage('');
   };
-
-  // סגירת דיאלוג השמירה
+  
+  // סגירת דיאלוג שמירה
   const closeSaveDialog = () => {
     setShowSaveDialog(false);
-    
-    // הודע לאפליקציה שדיאלוג השמירה נסגר
-    if (onSaveDialogClose) {
-      onSaveDialogClose();
-    }
-    
-    // החזר את הבחירה לפתק
-    if (onSelect) {
-      onSelect(id);
+    onSaveDialogClose?.();
+    onSelect?.(id);
+  };
+  
+  // טיפול בלחיצה מחוץ לדיאלוג
+  const handleClickOutside = (event) => {
+    if (showSaveDialog && saveDialogRef.current && !saveDialogRef.current.contains(event.target)) {
+      closeSaveDialog();
     }
   };
-
-  // סגירת דיאלוג בלחיצה מחוץ לדיאלוג
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (saveDialogRef.current && !saveDialogRef.current.contains(event.target)) {
-        closeSaveDialog();
+  
+  // רישום מאזין לחיצה חיצונית כשדיאלוג פתוח
+  if (showSaveDialog) {
+    document.addEventListener('mousedown', handleClickOutside);
+    setTimeout(() => {
+      if (!showSaveDialog) {
+        document.removeEventListener('mousedown', handleClickOutside);
       }
-    };
-
-    // הוספת מאזין לחיצה רק כאשר הדיאלוג מוצג
-    if (showSaveDialog) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showSaveDialog]);
-
-  // שמירת הפתק כקובץ
+    }, 0);
+  }
+  
+  // שמירת פתק לקובץ
   const handleSaveAsFile = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -145,43 +113,23 @@ const StickyNote = ({
       return;
     }
 
-    if (onSaveNote) {
-      // הכנת העתק של הנתונים לשמירה - לא מקושר למשתנים המקומיים
-      const noteDataToSave = {
-        text: text,
-        color: color
-      };
-      
-      // העבר את שם הקובץ ואת העתק התוכן לפונקציית השמירה
-      const success = onSaveNote(fileName, noteDataToSave);
-      
-      if (success) {
-        closeSaveDialog();
-        setFileName('');
-        setErrorMessage('');
-      } else {
-        setErrorMessage('Failed to save the note');
-      }
+    const success = onSaveNote?.(fileName, {
+      text: text,
+      color: color
+    });
+    
+    if (success) {
+      closeSaveDialog();
+      setFileName('');
+    } else {
+      setErrorMessage('Failed to save the note');
     }
   };
-
-  // עדכון טקסט מהחוץ
-  useEffect(() => {
-    setText(initialText || '');
-  }, [initialText]);
   
-  // התמקדות בטקסטאריה כאשר הפתק נבחר או במצב עריכה
-  useEffect(() => {
-    if (isEditing && textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  }, [isEditing]);
-  
-  // יצירת ייצוג ויזואלי של הטקסט עם סמן
+  // רנדור הטקסט עם סמן
   const renderTextWithCursor = () => {
     if (!isSelected || isEditing || showSaveDialog) return text;
     
-    // הוספת אלמנט הסמן לסוף הטקסט רק אם הפתק נבחר ואין דיאלוג פתוח
     return (
       <>
         {text}
@@ -203,34 +151,19 @@ const StickyNote = ({
             value={text}
             onChange={(e) => {
               setText(e.target.value);
-              if (onUpdate) {
-                onUpdate(id, { text: e.target.value, color });
-              }
+              onUpdate?.(id, { text: e.target.value, color });
             }}
             autoFocus
           />
           <div className="note-toolbar">
             <div className="color-options">
-              <button 
-                className="color-option yellow" 
-                onClick={() => handleColorChange('yellow')}
-              ></button>
-              <button 
-                className="color-option green" 
-                onClick={() => handleColorChange('green')}
-              ></button>
-              <button 
-                className="color-option pink" 
-                onClick={() => handleColorChange('pink')}
-              ></button>
-              <button 
-                className="color-option blue" 
-                onClick={() => handleColorChange('blue')}
-              ></button>
-              <button 
-                className="color-option purple" 
-                onClick={() => handleColorChange('purple')}
-              ></button>
+              {['yellow', 'green', 'pink', 'blue'].map(colorOption => (
+                <button 
+                  key={colorOption}
+                  className={`color-option ${colorOption}`} 
+                  onClick={() => handleColorChange(colorOption)}
+                />
+              ))}
             </div>
             <button className="save-button" onClick={handleSave}>Save</button>
           </div>
@@ -256,7 +189,7 @@ const StickyNote = ({
         >
           <div 
             className="note-save-dialog" 
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
             ref={saveDialogRef}
           >
             <h3>Save Note As</h3>

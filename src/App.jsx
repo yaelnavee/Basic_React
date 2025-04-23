@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState } from "react";
 import StickyNote from './components/StickyNote.jsx';
 import Keyboard from './components/Keyboard.jsx'; 
 import EmojisBox from './components/EmojisBox.jsx';
@@ -8,19 +8,19 @@ import { useNotesManager } from './components/NotesManager.jsx';
 import './App.css';
 
 function App() {
-  const [keyPressed, setKeyPressed] = useState('');
+  // מצב משתמש
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState('');
   const [isSigningUp, setIsSigningUp] = useState(false);
   
-  // State for notes management
+  // מצב פתקים
   const [selectedNoteId, setSelectedNoteId] = useState(null);
   const [lastUpdatedId, setLastUpdatedId] = useState(null);
   
-  // State to track if a save dialog is open
+  // מצב דיאלוגים
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
-  // Use our StickyNotes hook
+  // שימוש במנהל הפתקים
   const {
     notes,
     addNote,
@@ -41,61 +41,29 @@ function App() {
     setLastUpdatedId
   });
 
-  // Get the currently selected note
+  // קבלת הפתק הנבחר הנוכחי
   const getCurrentNote = () => {
     if (selectedNoteId === null) return null;
     return notes.find(note => note.id === selectedNoteId) || null;
   };
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      // אם יש דיאלוג שמירה פתוח, לא לעדכן את הפתק
-      if (isSaveDialogOpen) return;
-      
-      setKeyPressed(event.key);
-      
-      if (selectedNoteId !== null) {
-        updateSelectedNoteText(event.key);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedNoteId, updateSelectedNoteText, isSaveDialogOpen]); 
-
-  useEffect(() => {
-    const handleVirtualKeyDown = (event) => {
-      // אם יש דיאלוג שמירה פתוח, לא לעדכן את הפתק
-      if (isSaveDialogOpen) return;
-      
-      if (event.detail && event.detail.virtual) {
-        const key = event.detail.key;
-        
-        if (selectedNoteId !== null) {
-          updateSelectedNoteText(key);
-        }
-      }
-    };
-
-    window.addEventListener('virtualkeydown', handleVirtualKeyDown);
-    return () => window.removeEventListener('virtualkeydown', handleVirtualKeyDown);
-  }, [selectedNoteId, updateSelectedNoteText, isSaveDialogOpen]); 
-
+  // טיפול בלחיצה על מקש במקלדת הוירטואלית
   const handleVirtualKeyPress = (key) => {
-    // אם יש דיאלוג שמירה פתוח, לא לשלוח אירועי מקלדת
+    // אם יש דיאלוג פתוח, לא לעדכן את הפתק
     if (isSaveDialogOpen) return;
     
-    const customEvent = new CustomEvent('virtualkeydown', { 
-      detail: { key, virtual: true } 
-    });
-    window.dispatchEvent(customEvent);
+    if (selectedNoteId !== null) {
+      updateSelectedNoteText(key);
+    }
   };
 
+  // טיפול בכניסה למערכת
   const handleLogin = (username) => {
     setIsAuthenticated(true);
     setUsername(username);
   };
 
+  // טיפול ביציאה מהמערכת
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUsername('');
@@ -103,10 +71,16 @@ function App() {
     setLastUpdatedId(null);
   };
 
-  // Handler for loading a note from a file
-  const handleLoadNote = (noteData) => {
-    loadNoteFromFile(noteData);
-  };
+  // רישום למקלדת פיזית
+  if (typeof document !== 'undefined') {
+    document.onkeydown = (event) => {
+      if (isSaveDialogOpen) return;
+      
+      if (selectedNoteId !== null) {
+        updateSelectedNoteText(event.key);
+      }
+    };
+  }
 
   return (
     <div className="app-container">
@@ -131,7 +105,7 @@ function App() {
                 {/* File Control Component */}
                 <div className="file-control-container">
                   <FileControl 
-                    onLoadNote={handleLoadNote}
+                    onLoadNote={loadNoteFromFile}
                     onSaveNote={saveNoteToFile}
                     username={username}
                     currentNote={getCurrentNote()}
