@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import defaultAvatar from "/avatar.png";
+import "./UserProfile.css"; // <-- Add this line
 
 function UserProfile({ username, onLogout, userImage, onImageChange }) {
   const [fileInput, setFileInput] = useState(null);
@@ -24,22 +25,12 @@ function UserProfile({ username, onLogout, userImage, onImageChange }) {
     <div className="user-container">
       <div
         className="user-avatar"
-        style={{
-          width: 64,
-          height: 64,
-          borderRadius: "50%",
-          overflow: "hidden",
-          margin: "0 auto",
-          cursor: "pointer",
-          border: "2px solid #ccc"
-        }}
         onClick={handleImageClick}
         title="Change profile picture"
       >
         <img
           src={userImage || defaultAvatar}
           alt="User"
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
         />
         <input
           type="file"
