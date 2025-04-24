@@ -5,6 +5,7 @@ import EmojisBox from './components/EmojisBox.jsx';
 import Login from "./components/login.jsx";
 import FileControl from "./components/FileControl.jsx";
 import { useNotesManager } from './components/NotesManager.jsx';
+ import FontBox from './components/FontsBox.jsx';
 import './App.css';
 
 function App() {
@@ -146,7 +147,8 @@ function App() {
             <div className="keyboard-row">
               <EmojisBox onEmojiClick={handleEmojiClick} />
               <Keyboard onKeyPress={handleVirtualKeyPress} />
-              <div className="Fonts-box">Fonts</div>
+              
+              <FontBox  />
               <div className="Colors-box">Colors</div>
             </div>
           </div>

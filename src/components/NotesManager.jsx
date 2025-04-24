@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import StickyNote from './StickyNote.jsx';
 
-// Using a custom hook approach instead of a component
 const useNotesManager = ({ 
   username, 
   isAuthenticated, 
@@ -10,68 +9,57 @@ const useNotesManager = ({
   lastUpdatedId, 
   setLastUpdatedId 
 }) => {
-  // State for notes management
-  const [notes, setNotes] = useState([]);
-  const [nextId, setNextId] = useState(1);
-
-  // Load notes from localStorage when user authenticates
-  useEffect(() => {
+  const [notes, setNotes] = useState(() => {
+    // Initialize notes from localStorage during first render
     if (isAuthenticated && username) {
       const savedNotes = localStorage.getItem(`stickyNotes_${username}`);
       if (savedNotes) {
         try {
           const parsedNotes = JSON.parse(savedNotes);
-          setNotes(parsedNotes);
-          
-          const maxId = Math.max(...parsedNotes.map(note => note.id), 0);
-          setNextId(maxId + 1);
-          
           if (parsedNotes.length > 0) {
             setSelectedNoteId(parsedNotes[0].id);
           }
+          return parsedNotes;
         } catch (error) {
           console.error("Error parsing saved notes:", error);
-          // Create first note if parsing failed
-          createFirstNote();
         }
-      } else {
-        // Create first note if none exists
-        createFirstNote();
       }
     }
-  }, [isAuthenticated, username, setSelectedNoteId]);
+    // Default to empty array if no saved notes
+    return [];
+  });
 
-  // Helper function to create a first note
+  const [nextId, setNextId] = useState(() => {
+    // Initialize nextId based on existing notes
+    if (notes.length > 0) {
+      return Math.max(...notes.map(note => note.id), 0) + 1;
+    }
+    return 1;
+  });
+
   const createFirstNote = () => {
     const firstNote = { id: 1, text: '', color: 'yellow' };
     setNotes([firstNote]);
     setNextId(2);
     setSelectedNoteId(1);
+    saveToLocalStorage([firstNote]);
   };
 
-  // Save notes to localStorage whenever they change
-  useEffect(() => {
+  const saveToLocalStorage = (updatedNotes) => {
     if (isAuthenticated && username) {
-      localStorage.setItem(`stickyNotes_${username}`, JSON.stringify(notes));
+      localStorage.setItem(`stickyNotes_${username}`, JSON.stringify(updatedNotes));
     }
-  }, [notes, isAuthenticated, username]);
-
-  // Reorder notes when one is updated
-  useEffect(() => {
-    if (lastUpdatedId !== null && lastUpdatedId !== selectedNoteId) {
-      reorderNotes(lastUpdatedId);
-      setLastUpdatedId(null);
-    }
-  }, [selectedNoteId, lastUpdatedId, setLastUpdatedId]);
+  };
 
   const reorderNotes = (noteId) => {
     const updatedNote = notes.find(note => note.id === noteId);
     if (!updatedNote) return;
     const otherNotes = notes.filter(note => note.id !== noteId);
-    setNotes([updatedNote, ...otherNotes]);
+    const newNotes = [updatedNote, ...otherNotes];
+    setNotes(newNotes);
+    saveToLocalStorage(newNotes);
   };
 
-  // Add a new note
   const addNote = () => {
     const newId = nextId;
     const newNote = {
@@ -79,94 +67,37 @@ const useNotesManager = ({
       text: '',
       color: 'yellow'
     };
-    
-    // Add the new note to the beginning of the list
-    setNotes([newNote, ...notes]);
+    const newNotes = [newNote, ...notes];
+    setNotes(newNotes);
     setNextId(nextId + 1);
-    
-    // Automatically select the new note
     setSelectedNoteId(newId);
+    saveToLocalStorage(newNotes);
   };
 
-  // Load a note from a file
-  const loadNoteFromFile = (noteData) => {
-    if (!noteData || typeof noteData !== 'object') {
-      console.error("Invalid note data:", noteData);
-      return;
-    }
-
-    const newId = nextId;
-    const newNote = {
-      id: newId,
-      text: noteData.text || '',
-      color: noteData.color || 'yellow'
-    };
-    
-    // Add the loaded note to the beginning of the list
-    setNotes([newNote, ...notes]);
-    setNextId(nextId + 1);
-    
-    // Automatically select the new note
-    setSelectedNoteId(newId);
-  };
-
-  // Save a note to a file
-  const saveNoteToFile = (fileName, noteData) => {
-    if (!isAuthenticated || !username) {
-      console.error("User not authenticated");
-      return false;
-    }
-
-    if (!fileName || !noteData) {
-      console.error("Invalid file name or note data");
-      return false;
-    }
-
-    try {
-      // Create a storage key with the prefix for this user
-      const storageKey = `noteFiles_${username}_${fileName}`;
-      
-      // Create a clean copy of the note data to store - containing ONLY text and color
-      const cleanNoteData = {
-        text: noteData.text || '',
-        color: noteData.color || 'yellow'
-      };
-      
-      // Store the clean note data
-      localStorage.setItem(storageKey, JSON.stringify(cleanNoteData));
-      
-      return true;
-    } catch (error) {
-      console.error("Error saving note to file:", error);
-      return false;
-    }
-  };
-
-  // Delete a note
   const deleteNote = (id) => {
-    setNotes(notes.filter(note => note.id !== id));
+    const newNotes = notes.filter(note => note.id !== id);
+    setNotes(newNotes);
+    saveToLocalStorage(newNotes);
     
-    // If the deleted note is the selected note, select another one
     if (selectedNoteId === id) {
-      const remainingNotes = notes.filter(note => note.id !== id);
-      if (remainingNotes.length > 0) {
-        setSelectedNoteId(remainingNotes[0].id);
+      if (newNotes.length > 0) {
+        setSelectedNoteId(newNotes[0].id);
       } else {
         setSelectedNoteId(null);
       }
     }
 
-    // If the deleted note is the last updated note, reset the state
     if (lastUpdatedId === id) {
       setLastUpdatedId(null);
     }
   };
 
-  // Update a note
   const updateNote = (id, updatedData) => {
-    setNotes(notes.map(note => 
+    const newNotes = notes.map(note => 
       note.id === id ? { ...note, ...updatedData } : note
-    ));
+    );
+    setNotes(newNotes);
+    saveToLocalStorage(newNotes);
   };
 
   // When user finishes editing a note
@@ -230,15 +161,64 @@ const useNotesManager = ({
     }
   };
 
-  // When loading notes from a file, we need to set nextId based on loaded notes
-  useEffect(() => {
-    if (notes.length > 0) {
-      const maxId = Math.max(...notes.map(note => note.id), 0);
-      setNextId(maxId + 1);
-    } else {
-      setNextId(1);
+  // Load a note from a file
+  const loadNoteFromFile = (noteData) => {
+    if (!noteData || typeof noteData !== 'object') {
+      console.error("Invalid note data:", noteData);
+      return;
     }
-  }, [notes]);
+
+    const newId = nextId;
+    const newNote = {
+      id: newId,
+      text: noteData.text || '',
+      color: noteData.color || 'yellow'
+    };
+    
+    // Add the loaded note to the beginning of the list
+    const newNotes = [newNote, ...notes];
+    setNotes(newNotes);
+    
+    // Calculate next ID based on all notes including the new one
+    const maxId = Math.max(...newNotes.map(note => note.id), 0);
+    setNextId(maxId + 1);
+    
+    // Automatically select the new note
+    setSelectedNoteId(newId);
+    saveToLocalStorage(newNotes);
+  };
+
+  // Save a note to a file
+  const saveNoteToFile = (fileName, noteData) => {
+    if (!isAuthenticated || !username) {
+      console.error("User not authenticated");
+      return false;
+    }
+
+    if (!fileName || !noteData) {
+      console.error("Invalid file name or note data");
+      return false;
+    }
+
+    try {
+      // Create a storage key with the prefix for this user
+      const storageKey = `noteFiles_${username}_${fileName}`;
+      
+      // Create a clean copy of the note data to store - containing ONLY text and color
+      const cleanNoteData = {
+        text: noteData.text || '',
+        color: noteData.color || 'yellow'
+      };
+      
+      // Store the clean note data
+      localStorage.setItem(storageKey, JSON.stringify(cleanNoteData));
+      
+      return true;
+    } catch (error) {
+      console.error("Error saving note to file:", error);
+      return false;
+    }
+  };
 
   return {
     notes,

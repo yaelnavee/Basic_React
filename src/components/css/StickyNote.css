@@ -242,27 +242,16 @@
     background-color: #388e3c;
   }
   
-  /* שכבת חיפוי לדיאלוג שמירה */
-  .note-save-dialog-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
   /* דיאלוג שמירת הפתק */
   .note-save-dialog {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    padding: 15px;
-    width: 300px;
+    padding: 20px;
+    width: 350px;
     max-width: 90%;
     z-index: 1000;
   }
@@ -287,16 +276,19 @@
   .note-save-dialog .dialog-buttons {
     display: flex;
     justify-content: space-between;
-    margin-top: 12px;
+    margin-top: 15px;
+    gap: 5px;
   }
   
   .note-save-dialog .dialog-buttons button {
-    padding: 5px 10px;
+    padding: 6px 12px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 12px;
+    min-width: 60px;
+    max-width: 100px;
   }
   
   .note-save-dialog .dialog-buttons button:first-child {

@@ -1,52 +1,59 @@
-// קופסא עם אפשרויות פונט לעיצוב טקסט 
-// פונט עברי, פונט אנגלי, גודל פונט, עובי פונט, 
-//   קו חוצה
-
 import React, { useState } from 'react';
-// import './FontsBox.css'; 
-
+import './css/FontsBox.css';
 
 const FontsBox = ({ onFontChange }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [selectedFont, setSelectedFont] = useState(''); // מצב לשמירת הפונט הנבחר
-    const [selectedSize, setSelectedSize] = useState(''); // מצב לשמירת גודל הפונט הנבחר
-   
-    const toggleFontsBox = () => {
-        setIsOpen(!isOpen);
-    };
+    const [fonts] = useState([
+        { name: 'Arial', value: 'Arial, sans-serif' },
+        { name: 'Courier New', value: '"Courier New", monospace' },
+        { name: 'Georgia', value: 'Georgia, serif' },
+        { name: 'Times New Roman', value: '"Times New Roman", serif' },
+        { name: 'Verdana', value: 'Verdana, sans-serif' }
+    ]);
+
+    const [sizes] = useState([12, 14, 16, 18, 20, 24, 28, 32]);
 
     const handleFontChange = (font) => {
-        setSelectedFont(font);
-        onFontChange(font, selectedSize, selectedWeight, selectedStyle); // העברת הפונט הנבחר להורה
+        if (onFontChange) {
+            onFontChange(font);
+        }
     };
 
     const handleSizeChange = (size) => {
-        setSelectedSize(size);
-        onFontChange(selectedFont, size, selectedWeight, selectedStyle); // העברת גודל הפונט הנבחר להורה
+        if (onFontChange) {
+            onFontChange(size);
+        }
     };
 
     return (
         <div className="fonts-box">
-            <button className="fonts-button" onClick={toggleFontsBox}>
-                <FontAwesomeIcon icon={faFont} /> פונט
-            </button>
-            {isOpen && (
-                <div className="fonts-dropdown">
-                    <div className="font-options">
-                        <h4>בחר פונט:</h4>
-                        <button onClick={() => handleFontChange('Arial')}>Arial</button>
-                        <button onClick={() => handleFontChange('Times New Roman')}>Times New Roman</button>
-                        <button onClick={() => handleFontChange('Courier New')}>Courier New</button>
-                    </div>
-                    <div className="size-options">
-                        <h4>בחר גודל פונט:</h4>
-                        <button onClick={() => handleSizeChange('12px')}>12</button>
-                        <button onClick={() => handleSizeChange('16px')}>16</button>
-                        <button onClick={() => handleSizeChange('20px')}>20</button>
-                    </div>
-                </div>
-            )}
+            <h3>Select Font</h3>
+            <div className="font-options">
+                {fonts.map((font, index) => (
+                    <span
+                        key={index}
+                        className="font-item"
+                        style={{ fontFamily: font.value }}
+                        onClick={() => handleFontChange(font.value)}
+                    >
+                        {font.name}
+                    </span>
+                ))}
+            </div>
+            <h3>Select Size</h3>
+            <div className="size-options">
+                {sizes.map((size) => (
+                    <span
+                        key={size}
+                        className="size-item"
+                        style={{ fontSize: `${size}px` }}
+                        onClick={() => handleSizeChange(size)}
+                    >
+                        {size}
+                    </span>
+                ))}
+            </div>
         </div>
     );
 }
+
 export default FontsBox;

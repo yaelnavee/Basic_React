@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './css/FileControl.css';
 
 const FileControl = ({ onLoadNote, username, currentNote }) => {
@@ -9,13 +9,6 @@ const FileControl = ({ onLoadNote, username, currentNote }) => {
   // Prefix for file storage
   const FILE_STORAGE_PREFIX = `noteFiles_${username}_`;
   
-  // Load the list of saved files for this user
-  useEffect(() => {
-    if (username) {
-      loadSavedFilesList();
-    }
-  }, [username]);
-
   const loadSavedFilesList = () => {
     const files = [];
     // Iterate through localStorage to find all saved files for this user
