@@ -5,7 +5,9 @@ import EmojisBox from './components/EmojisBox.jsx';
 import Login from "./components/login.jsx";
 import FileControl from "./components/FileControl.jsx";
 import { useNotesManager } from './components/NotesManager.jsx';
- import FontBox from './components/FontsBox.jsx';
+import FontBox from './components/FontsBox.jsx';
+import UserProfile from "./components/UserProfile.jsx";
+import ColorsBox from './components/ColorsBox.jsx';
 import './App.css';
 
 function App() {
@@ -13,6 +15,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState('');
   const [isSigningUp, setIsSigningUp] = useState(false);
+  const [userImage, setUserImage] = useState(null);
   
   // מצב פתקים
   const [selectedNoteId, setSelectedNoteId] = useState(null);
@@ -58,10 +61,41 @@ function App() {
     }
   };
 
+  // הוספת פונקציה חדשה לטיפול בשינוי פונט
+  const handleFontStyleChange = (style) => {
+    if (selectedNoteId !== null) {
+      if (typeof style === 'number') {
+        // אם זה מספר, זה גודל פונט
+        updateNote(selectedNoteId, { fontSize: style });
+      } else {
+        // אחרת זה פונט
+        updateNote(selectedNoteId, { fontFamily: style });
+      }
+    }
+  };
+
+  // הוסף פונקציה לשינוי צבע
+  const handleColorChange = (color) => {
+    if (selectedNoteId !== null) {
+      updateNote(selectedNoteId, { color });
+    }
+  };
+
   // טיפול בכניסה למערכת
   const handleLogin = (username) => {
     setIsAuthenticated(true);
     setUsername(username);
+
+    // טען פתקים מהסטורג'
+    const saved = localStorage.getItem(`notes_${username}`);
+    if (saved) {
+      try {
+        // אם setNotes מגיע מ-useNotesManager:
+        // setNotes(JSON.parse(saved));
+        // אם יש פונקציה מתאימה ב-useNotesManager, השתמש בה:
+        // למשל: notesManager.loadNotes(JSON.parse(saved));
+      } catch {}
+    }
   };
 
   // טיפול ביציאה מהמערכת
@@ -92,10 +126,12 @@ function App() {
             <div className="notes-container">
               {/* Sidebar with user info and add note button */}
               <div className="sidebar">
-                <div className="user-container">
-                  <p>hey, {username}!</p>
-                  <button onClick={handleLogout}>logout</button>
-                </div>
+                <UserProfile
+                  username={username}
+                  onLogout={handleLogout}
+                  userImage={userImage}
+                  onImageChange={setUserImage}
+                />
                 
                 <div className="add-note-container">
                   <button onClick={addNote} className="add-note-button">
@@ -147,9 +183,11 @@ function App() {
             <div className="keyboard-row">
               <EmojisBox onEmojiClick={handleEmojiClick} />
               <Keyboard onKeyPress={handleVirtualKeyPress} />
-              
-              <FontBox  />
-              <div className="Colors-box">Colors</div>
+              <FontBox onFontChange={handleFontStyleChange} />
+              <ColorsBox 
+               onColorChange={color => updateNote(selectedNoteId, { color })}
+               onBgColorChange={bgColor => updateNote(selectedNoteId, { backgroundColor: bgColor })}
+              />
             </div>
           </div>
         </>

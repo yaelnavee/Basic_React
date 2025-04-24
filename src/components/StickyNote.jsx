@@ -138,11 +138,16 @@ const StickyNote = ({
     );
   };
 
+  const noteContentStyle = {
+    fontFamily: 'Arial, sans-serif',
+    fontSize: '16px'
+  };
+
   return (
     <div 
-      className={`sticky-note ${color} ${isSelected && !showSaveDialog ? 'selected' : ''}`} 
-      onDoubleClick={handleDoubleClick}
+      className={`sticky-note ${color} ${isSelected && !showSaveDialog ? 'selected' : ''}`}
       onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
     >
       {isEditing ? (
         <div className="editing-mode">
@@ -170,7 +175,9 @@ const StickyNote = ({
         </div>
       ) : (
         <>
-          <div className="note-content">{renderTextWithCursor()}</div>
+          <div className="note-content" style={noteContentStyle}>
+            {renderTextWithCursor()}
+          </div>
           <div className="note-buttons">
             <button className="save-note-button" onClick={handleSaveClick} title="Save note to file">💾</button>
             <button className="delete-button" onClick={handleDelete} title="Delete note">×</button>

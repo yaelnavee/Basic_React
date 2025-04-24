@@ -1,7 +1,7 @@
 .app-container {
   width: 100%;
   height: 100vh;
-  font-family: Arial, sans-serif;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
 }
 
 /* Main grid container */
@@ -64,6 +64,10 @@
 
 .user-container button:hover {
   background-color: #e94646;
+}
+
+.user-avatar img {
+  display: block;
 }
 
 /* Add note button container */
@@ -225,7 +229,7 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .grid-container {
-    grid-template-rows: 5fr 2fr; /* יותר מקום לפתקים, פחות למקלדת */
+    grid-template-rows: 3fr 1fr; /* Adjusted ratio for better visibility */
     height: 100vh;
     gap: 10px;
     padding: 10px;
@@ -236,14 +240,15 @@
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
     gap: 10px;
-    min-height: 0; /* חשוב בשביל overflow */
+    min-height: 0; /* Important for overflow handling */
+    max-height: 65vh; /* Ensure notes container has enough height */
   }
 
   .notes-display-area {
     grid-row: 2;
     overflow-y: auto;
-    min-height: 0; /* חשוב בשביל overflow */
-    max-height: 100%;
+    min-height: 200px; /* Minimum height to ensure visibility */
+    max-height: calc(65vh - 80px); /* Subtract header height */
     padding: 5px;
   }
 
@@ -252,16 +257,16 @@
     grid-template-rows: repeat(2, auto);
     gap: 5px;
     padding: 5px;
-    max-height: 30vh; /* הגבלת גובה המקלדת */
+    max-height: 25vh; /* Keyboard height limit */
   }
 
   .keyboard-component {
     grid-column: 1 / span 2;
     grid-row: 2;
-    max-height: 15vh; /* הגבלת גובה המקלדת עצמה */
+    max-height: 15vh; /* Keyboard component height limit */
   }
 
-  /* התאמת גודל הפתקים */
+  /* Note size adjustments */
   .sticky-note {
     min-width: 140px;
     min-height: 140px;
@@ -269,7 +274,7 @@
     padding: 10px;
   }
 
-  /* התאמת הסרגל הצדדי */
+  /* Sidebar adjustments */
   .sidebar {
     flex-direction: row;
     justify-content: space-between;
@@ -282,17 +287,26 @@
     flex: 0 1 auto;
   }
 
-  .add-note-container, .file-control-container {
+  .add-note-container {
     flex: 0 1 auto;
     margin-left: 10px;
   }
 }
 
-/* מסכים קטנים מאוד */
+/* Very small screens */
 @media (max-width: 480px) {
   .grid-container {
-    grid-template-rows: 4fr 2fr; /* עוד יותר מקום לפתקים */
+    grid-template-rows: 2.5fr 1fr; /* Adjusted ratio */
     padding: 5px;
+  }
+
+  .notes-container {
+    max-height: 60vh;
+  }
+
+  .notes-display-area {
+    min-height: 180px;
+    max-height: calc(60vh - 70px);
   }
 
   .sticky-note {
@@ -303,15 +317,23 @@
   }
 
   .keyboard-row {
-    max-height: 25vh;
+    max-height: 30vh;
   }
 
   .keyboard-component {
-    max-height: 12vh;
+    max-height: 15vh;
   }
 
   .sidebar {
     padding: 3px;
+    flex-direction: column; /* Stack elements vertically on very small screens */
+    gap: 5px;
+  }
+
+  .user-container,
+  .add-note-container,
+  .file-control-container {
+    width: 100%;
   }
 
   .user-container button,
@@ -319,5 +341,7 @@
   .file-button {
     padding: 4px 6px;
     font-size: 12px;
+    width: 100%;
+    margin: 2px 0;
   }
 }

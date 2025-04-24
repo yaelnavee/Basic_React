@@ -42,7 +42,7 @@
   
   /* תוכן הפתק */
   .note-content {
-    font-family: 'Arial', 'Segoe UI', sans-serif;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
     font-size: 16px;
     line-height: 1.5;
     min-height: 170px;
@@ -50,6 +50,7 @@
     white-space: pre-wrap;
     word-break: break-word;
     direction: rtl;
+    transition: font-family 0.3s, font-size 0.3s;
   }
   
   /* עיצוב סמן */
@@ -176,7 +177,7 @@
     flex: 1;
     border: none;
     background: transparent;
-    font-family: 'Arial', 'Segoe UI', sans-serif;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
     font-size: 16px;
     line-height: 1.5;
     resize: none;

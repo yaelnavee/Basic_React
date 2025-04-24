@@ -26,7 +26,7 @@ const FontsBox = ({ onFontChange }) => {
 
     return (
         <div className="fonts-box">
-            <h3>Select Font</h3>
+            <h3>Font:</h3>
             <div className="font-options">
                 {fonts.map((font, index) => (
                     <span
@@ -39,7 +39,7 @@ const FontsBox = ({ onFontChange }) => {
                     </span>
                 ))}
             </div>
-            <h3>Select Size</h3>
+            <h3>Size:</h3>
             <div className="size-options">
                 {sizes.map((size) => (
                     <span

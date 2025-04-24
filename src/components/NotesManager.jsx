@@ -38,7 +38,13 @@ const useNotesManager = ({
   });
 
   const createFirstNote = () => {
-    const firstNote = { id: 1, text: '', color: 'yellow' };
+    const firstNote = { 
+      id: 1, 
+      text: '', 
+      color: 'yellow',
+      fontFamily: 'Arial, sans-serif',
+      fontSize: 16
+    };
     setNotes([firstNote]);
     setNextId(2);
     setSelectedNoteId(1);
@@ -65,7 +71,9 @@ const useNotesManager = ({
     const newNote = {
       id: newId,
       text: '',
-      color: 'yellow'
+      color: 'yellow',
+      fontFamily: 'Arial, sans-serif',
+      fontSize: 16
     };
     const newNotes = [newNote, ...notes];
     setNotes(newNotes);
@@ -122,7 +130,11 @@ const useNotesManager = ({
     let newText = currentText;
 
     switch (key) {
-      case 'Backspace':
+      case 'DelWord':
+        const words = currentText.trim().split(/\s+/);
+        words.pop();
+        newText = words.join(' ');
+        break;
       case 'Del':
         newText = currentText.slice(0, -1); 
         break;
