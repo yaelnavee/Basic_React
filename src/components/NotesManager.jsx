@@ -232,6 +232,16 @@ const useNotesManager = ({
     }
   };
 
+  const loadNotes = (notesArr) => {
+    setNotes(notesArr || []);
+    saveToLocalStorage(notesArr || []);
+    if (notesArr && notesArr.length > 0) {
+      setSelectedNoteId(notesArr[0].id);
+    } else {
+      setSelectedNoteId(null);
+    }
+  };
+
   return {
     notes,
     setNotes,
@@ -243,7 +253,8 @@ const useNotesManager = ({
     updateSelectedNoteText,
     handleEmojiClick,
     loadNoteFromFile,
-    saveNoteToFile
+    saveNoteToFile,
+    loadNotes
   };
 };
 

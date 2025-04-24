@@ -12,7 +12,9 @@ const StickyNote = ({
   onEditEnd, 
   onSaveNote,
   onSaveDialogOpen,
-  onSaveDialogClose
+  onSaveDialogClose,
+  username,
+  notes 
 }) => {
   // מצב הפתק
   const [text, setText] = useState(initialText || '');
@@ -103,7 +105,6 @@ const StickyNote = ({
     }, 0);
   }
   
-  // שמירת פתק לקובץ
   const handleSaveAsFile = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -126,7 +127,6 @@ const StickyNote = ({
     }
   };
   
-  // רנדור הטקסט עם סמן
   const renderTextWithCursor = () => {
     if (!isSelected || isEditing || showSaveDialog) return text;
     
@@ -180,7 +180,7 @@ const StickyNote = ({
           </div>
           <div className="note-buttons">
             <button className="save-note-button" onClick={handleSaveClick} title="Save note to file">💾</button>
-            <button className="delete-button" onClick={handleDelete} title="Delete note">×</button>
+            <button className="delete-button" onClick={handleDelete} title="Delete note">X</button>
           </div>
         </>
       )}

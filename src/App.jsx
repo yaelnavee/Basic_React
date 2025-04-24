@@ -35,7 +35,8 @@ function App() {
     updateSelectedNoteText,
     handleEmojiClick,
     loadNoteFromFile,
-    saveNoteToFile
+    saveNoteToFile,
+    loadNotes
   } = useNotesManager({
     username,
     isAuthenticated,
@@ -51,9 +52,7 @@ function App() {
     return notes.find(note => note.id === selectedNoteId) || null;
   };
 
-  // טיפול בלחיצה על מקש במקלדת הוירטואלית
   const handleVirtualKeyPress = (key) => {
-    // אם יש דיאלוג פתוח, לא לעדכן את הפתק
     if (isSaveDialogOpen) return;
     
     if (selectedNoteId !== null) {
@@ -86,15 +85,11 @@ function App() {
     setIsAuthenticated(true);
     setUsername(username);
 
-    // טען פתקים מהסטורג'
-    const saved = localStorage.getItem(`notes_${username}`);
+    // טען פתקים מהסטורג' לפי המפתח הנכון
+    const saved = localStorage.getItem(`stickyNotes_${username}`);
     if (saved) {
-      try {
-        // אם setNotes מגיע מ-useNotesManager:
-        // setNotes(JSON.parse(saved));
-        // אם יש פונקציה מתאימה ב-useNotesManager, השתמש בה:
-        // למשל: notesManager.loadNotes(JSON.parse(saved));
-      } catch {}
+      const parsedNotes = JSON.parse(saved);
+      loadNotes(parsedNotes);
     }
   };
 
@@ -163,7 +158,6 @@ function App() {
                     onEditEnd={() => handleNoteEditEnd(note.id)}
                     isSelected={note.id === selectedNoteId}
                     onSelect={(id) => {
-                      // אם מקבלים null מהפתק, סימן שדיאלוג השמירה פתוח
                       if (id === null) {
                         setIsSaveDialogOpen(true);
                       } else {
@@ -174,7 +168,9 @@ function App() {
                     onSaveNote={saveNoteToFile}
                     onSaveDialogOpen={() => setIsSaveDialogOpen(true)}
                     onSaveDialogClose={() => setIsSaveDialogOpen(false)}
-                  />
+                    username={username}  
+                    notes={notes}               
+                    />
                 ))}
               </div>
             </div>
