@@ -62,7 +62,9 @@ const useNotesManager = ({
     if (!updatedNote) return;
     const otherNotes = notes.filter(note => note.id !== noteId);
     const newNotes = [updatedNote, ...otherNotes];
+    // עדכן את מצב הרשימה
     setNotes(newNotes);
+    // שמור לאחסון מקומי
     saveToLocalStorage(newNotes);
   };
 
@@ -116,6 +118,12 @@ const useNotesManager = ({
 
   // Select a note
   const selectNote = (id) => {
+    // אם יש פתק מעודכן אחרון ואנחנו בוחרים פתק אחר, נסדר מחדש
+    if (lastUpdatedId !== null && lastUpdatedId !== id) {
+      reorderNotes(lastUpdatedId);
+      setLastUpdatedId(null); // איפוס אחרי הטיפול
+    }
+    
     setSelectedNoteId(id);
   };
 
@@ -179,13 +187,19 @@ const useNotesManager = ({
       console.error("Invalid note data:", noteData);
       return;
     }
-
+  
     const newId = nextId;
     const newNote = {
       id: newId,
       text: noteData.text || '',
-      color: noteData.color || 'yellow'
+      color: noteData.color || 'yellow',
+      fontFamily: noteData.fontFamily || 'Arial, sans-serif',
+      fontSize: noteData.fontSize || 16,
+      textColor: noteData.textColor || '#222222',
+      backgroundColor: noteData.backgroundColor || ''
     };
+    
+    console.log("Loading note with properties:", newNote);
     
     // Add the loaded note to the beginning of the list
     const newNotes = [newNote, ...notes];
@@ -206,24 +220,29 @@ const useNotesManager = ({
       console.error("User not authenticated");
       return false;
     }
-
+  
     if (!fileName || !noteData) {
       console.error("Invalid file name or note data");
       return false;
     }
-
+  
     try {
       // Create a storage key with the prefix for this user
       const storageKey = `noteFiles_${username}_${fileName}`;
       
-      // Create a clean copy of the note data to store - containing ONLY text and color
+      // Create a clean copy of the note data to store - עם כל המאפיינים
       const cleanNoteData = {
         text: noteData.text || '',
-        color: noteData.color || 'yellow'
+        color: noteData.color || 'yellow',
+        fontFamily: noteData.fontFamily || 'Arial, sans-serif',
+        fontSize: noteData.fontSize || 16,
+        textColor: noteData.textColor || '#222222',
+        backgroundColor: noteData.backgroundColor || ''
       };
       
       // Store the clean note data
       localStorage.setItem(storageKey, JSON.stringify(cleanNoteData));
+      console.log(`Note saved to file: ${fileName} with all style properties`);
       
       return true;
     } catch (error) {

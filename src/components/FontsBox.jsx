@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './css/FontsBox.css';
 
-const FontsBox = ({ onFontChange }) => {
+const FontsBox = ({ onFontChange, selectedFont, selectedSize }) => {
     const [fonts] = useState([
         { name: 'Arial', value: 'Arial, sans-serif' },
         { name: 'Courier New', value: '"Courier New", monospace' },
@@ -11,14 +11,36 @@ const FontsBox = ({ onFontChange }) => {
     ]);
 
     const [sizes] = useState([12, 14, 16, 18, 20, 24, 28, 32]);
+    
+    // מעקב אחרי הפונט הנבחר וגודל הפונט הנבחר במצב פנימי
+    const [activeFontValue, setActiveFontValue] = useState(selectedFont || fonts[0].value);
+    const [activeSizeValue, setActiveSizeValue] = useState(selectedSize || 16);
+
+    // עדכון הערכים הפנימיים כאשר Props משתנים
+    useEffect(() => {
+        if (selectedFont) {
+            setActiveFontValue(selectedFont);
+        }
+        if (selectedSize) {
+            setActiveSizeValue(selectedSize);
+        }
+    }, [selectedFont, selectedSize]);
 
     const handleFontChange = (font) => {
+        // עדכון המצב הפנימי
+        setActiveFontValue(font);
+        
+        // קריאה לפונקציה שהועברה מבחוץ
         if (onFontChange) {
             onFontChange(font);
         }
     };
 
     const handleSizeChange = (size) => {
+        // עדכון המצב הפנימי
+        setActiveSizeValue(size);
+        
+        // קריאה לפונקציה שהועברה מבחוץ
         if (onFontChange) {
             onFontChange(size);
         }
@@ -31,7 +53,7 @@ const FontsBox = ({ onFontChange }) => {
                 {fonts.map((font, index) => (
                     <span
                         key={index}
-                        className="font-item"
+                        className={`font-item ${font.value === activeFontValue ? 'active' : ''}`}
                         style={{ fontFamily: font.value }}
                         onClick={() => handleFontChange(font.value)}
                     >
@@ -44,7 +66,7 @@ const FontsBox = ({ onFontChange }) => {
                 {sizes.map((size) => (
                     <span
                         key={size}
-                        className="size-item"
+                        className={`size-item ${size === activeSizeValue ? 'active' : ''}`}
                         style={{ fontSize: `${size}px` }}
                         onClick={() => handleSizeChange(size)}
                     >

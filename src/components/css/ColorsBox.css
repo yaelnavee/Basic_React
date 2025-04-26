@@ -36,3 +36,10 @@
   transform: scale(1.15);
   border-color: #ffa83f;
 }
+
+/* שמירה על העיצוב למצב פעיל (active) */
+.color-item.active {
+  border: 3px solid #000;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}

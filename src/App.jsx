@@ -60,16 +60,22 @@ function App() {
     }
   };
 
-  // הוספת פונקציה חדשה לטיפול בשינוי פונט
+  //  פונקציה לטיפול בשינוי פונט
   const handleFontStyleChange = (style) => {
     if (selectedNoteId !== null) {
       if (typeof style === 'number') {
         // אם זה מספר, זה גודל פונט
         updateNote(selectedNoteId, { fontSize: style });
+        console.log(`Changed font size to ${style}px for note ${selectedNoteId}`);
       } else {
         // אחרת זה פונט
         updateNote(selectedNoteId, { fontFamily: style });
+        console.log(`Changed font family to ${style} for note ${selectedNoteId}`);
       }
+      // סימון הפתק כעודכן לאחרונה
+      setLastUpdatedId(selectedNoteId);
+    } else {
+      console.log("No note selected for font style change");
     }
   };
 
@@ -77,6 +83,30 @@ function App() {
   const handleColorChange = (color) => {
     if (selectedNoteId !== null) {
       updateNote(selectedNoteId, { color });
+    }
+  };
+
+  // פונקציה לטיפול בשינוי צבע הטקסט
+  const handleTextColorChange = (color) => {
+    if (selectedNoteId !== null) {
+      updateNote(selectedNoteId, { textColor: color });
+      console.log(`Changed text color to ${color} for note ${selectedNoteId}`);
+      // סימון הפתק כעודכן לאחרונה
+      setLastUpdatedId(selectedNoteId);
+  }   else {
+      console.log("No note selected for text color change");
+    } 
+  };
+
+  // פונקציה לטיפול בשינוי צבע הרקע
+  const handleBackgroundColorChange = (color) => {
+    if (selectedNoteId !== null) {
+      updateNote(selectedNoteId, { backgroundColor: color });
+      console.log(`Changed background color to ${color} for note ${selectedNoteId}`);
+      // סימון הפתק כעודכן לאחרונה
+      setLastUpdatedId(selectedNoteId);
+    } else {
+      console.log("No note selected for background color change");
     }
   };
 
@@ -149,28 +179,32 @@ function App() {
               <div className="notes-display-area">
                 {notes.map(note => (
                   <StickyNote 
-                    key={note.id}
-                    id={note.id}
-                    initialText={note.text}
-                    initialColor={note.color}
-                    onDelete={deleteNote}
-                    onUpdate={updateNote}
-                    onEditEnd={() => handleNoteEditEnd(note.id)}
-                    isSelected={note.id === selectedNoteId}
-                    onSelect={(id) => {
-                      if (id === null) {
-                        setIsSaveDialogOpen(true);
-                      } else {
-                        setIsSaveDialogOpen(false);
-                        selectNote(id);
-                      }
-                    }}
-                    onSaveNote={saveNoteToFile}
-                    onSaveDialogOpen={() => setIsSaveDialogOpen(true)}
-                    onSaveDialogClose={() => setIsSaveDialogOpen(false)}
-                    username={username}  
-                    notes={notes}               
-                    />
+                  key={note.id}
+                  id={note.id}
+                  initialText={note.text}
+                  initialColor={note.color}
+                  initialFontFamily={note.fontFamily}
+                  initialFontSize={note.fontSize}
+                  initialTextColor={note.textColor}       
+                  initialBackgroundColor={note.backgroundColor} 
+                  onDelete={deleteNote}
+                  onUpdate={updateNote}
+                  onEditEnd={() => handleNoteEditEnd(note.id)}
+                  isSelected={note.id === selectedNoteId}
+                  onSelect={(id) => {
+                    if (id === null) {
+                      setIsSaveDialogOpen(true);
+                    } else {
+                      setIsSaveDialogOpen(false);
+                      selectNote(id);
+                    }
+                  }}
+                  onSaveNote={saveNoteToFile}
+                  onSaveDialogOpen={() => setIsSaveDialogOpen(true)}
+                  onSaveDialogClose={() => setIsSaveDialogOpen(false)}
+                  username={username}  
+                  notes={notes}               
+                />
                 ))}
               </div>
             </div>
@@ -179,10 +213,16 @@ function App() {
             <div className="keyboard-row">
               <EmojisBox onEmojiClick={handleEmojiClick} />
               <Keyboard onKeyPress={handleVirtualKeyPress} />
-              <FontBox onFontChange={handleFontStyleChange} />
+              <FontBox 
+                onFontChange={handleFontStyleChange} 
+                selectedFont={getCurrentNote()?.fontFamily} 
+                selectedSize={getCurrentNote()?.fontSize}
+              />
               <ColorsBox 
-               onColorChange={color => updateNote(selectedNoteId, { color })}
-               onBgColorChange={bgColor => updateNote(selectedNoteId, { backgroundColor: bgColor })}
+                onColorChange={handleTextColorChange}
+                onBgColorChange={handleBackgroundColorChange}
+                selectedTextColor={getCurrentNote()?.textColor}
+                selectedBgColor={getCurrentNote()?.backgroundColor}
               />
             </div>
           </div>

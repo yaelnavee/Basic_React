@@ -5,6 +5,10 @@ const StickyNote = ({
   id, 
   initialText, 
   initialColor, 
+  initialFontFamily,  
+  initialFontSize,   
+  initialTextColor,    
+  initialBackgroundColor, 
   onDelete, 
   onUpdate, 
   isSelected, 
@@ -16,9 +20,13 @@ const StickyNote = ({
   username,
   notes 
 }) => {
-  // מצב הפתק
+  //ברירת מחדל - מצב הפתק
   const [text, setText] = useState(initialText || '');
   const [color, setColor] = useState(initialColor || 'yellow');
+  const [fontFamily, setFontFamily] = useState(initialFontFamily || 'Arial, sans-serif'); 
+  const [textColor, setTextColor] = useState(initialTextColor || '#222222'); 
+  const [backgroundColor, setBackgroundColor] = useState(initialBackgroundColor || ''); 
+  const [fontSize, setFontSize] = useState(initialFontSize || 16); 
   const [isEditing, setIsEditing] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [fileName, setFileName] = useState('');
@@ -34,6 +42,31 @@ const StickyNote = ({
     setText(initialText);
   }
   
+  // עדכון צבע אם השתנה מבחוץ
+  if (initialColor !== undefined && initialColor !== color) {
+    setColor(initialColor);
+  }
+
+  // עדכון פונט אם השתנה מבחוץ
+  if (initialFontFamily !== undefined && initialFontFamily !== fontFamily) {
+    setFontFamily(initialFontFamily);
+  }
+
+  // עדכון גודל פונט אם השתנה מבחוץ
+  if (initialFontSize !== undefined && initialFontSize !== fontSize) {
+    setFontSize(initialFontSize);
+  }
+  
+  // עדכון צבע טקסט אם השתנה מבחוץ
+  if (initialTextColor !== undefined && initialTextColor !== textColor) {
+    setTextColor(initialTextColor);
+  }
+  
+  // עדכון צבע רקע אם השתנה מבחוץ
+  if (initialBackgroundColor !== undefined && initialBackgroundColor !== backgroundColor) {
+    setBackgroundColor(initialBackgroundColor);
+  }
+
   // בחירת פתק
   const handleClick = () => {
     if (showSaveDialog) return;
@@ -51,14 +84,28 @@ const StickyNote = ({
   // שמירת שינויים בפתק
   const handleSave = () => {
     setIsEditing(false);
-    onUpdate?.(id, { text, color });
+    onUpdate?.(id, { 
+      text, 
+      color, 
+      fontFamily, 
+      fontSize,
+      textColor,
+      backgroundColor
+    });
     onEditEnd?.(id);
   };
   
   // שינוי צבע הפתק
   const handleColorChange = (newColor) => {
     setColor(newColor);
-    onUpdate?.(id, { text, color: newColor });
+    onUpdate?.(id, { 
+      text, 
+      color: newColor, 
+      fontFamily, 
+      fontSize,
+      textColor,
+      backgroundColor
+    });
   };
   
   // מחיקת פתק
@@ -116,7 +163,11 @@ const StickyNote = ({
 
     const success = onSaveNote?.(fileName, {
       text: text,
-      color: color
+      color: color,
+      fontFamily: fontFamily,
+      fontSize: fontSize,
+      textColor: textColor,
+      backgroundColor: backgroundColor
     });
     
     if (success) {
@@ -138,10 +189,14 @@ const StickyNote = ({
     );
   };
 
+  // יצירת סגנון עבור תוכן הפתק, כולל פונט, גודל פונט, צבע טקסט וצבע רקע
   const noteContentStyle = {
-    fontFamily: 'Arial, sans-serif',
-    fontSize: '16px'
+    fontFamily: fontFamily,
+    fontSize: `${fontSize}px`,
+    color: textColor,
+    backgroundColor: backgroundColor || undefined
   };
+
 
   return (
     <div 
@@ -154,9 +209,17 @@ const StickyNote = ({
           <textarea
             ref={textareaRef}
             value={text}
+            style={noteContentStyle} // הוספת סגנון לאזור העריכה
             onChange={(e) => {
               setText(e.target.value);
-              onUpdate?.(id, { text: e.target.value, color });
+              onUpdate?.(id, { 
+                text: e.target.value, 
+                color,
+                fontFamily,
+                fontSize,
+                textColor,
+                backgroundColor
+              });
             }}
             autoFocus
           />

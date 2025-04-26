@@ -38,9 +38,14 @@ const FileControl = ({ onLoadNote, username, currentNote }) => {
         const noteData = JSON.parse(fileContent);
         // Ensure the noteData has the expected structure
         if (typeof noteData === 'object') {
+          // מבנה פתק משופר עם כל המאפיינים
           const formattedNote = {
             text: noteData.text || '',
-            color: noteData.color || 'yellow'
+            color: noteData.color || 'yellow',
+            fontFamily: noteData.fontFamily || 'Arial, sans-serif',
+            fontSize: noteData.fontSize || 16,
+            textColor: noteData.textColor || '#222222',
+            backgroundColor: noteData.backgroundColor || ''
           };
           
           onLoadNote(formattedNote);
