@@ -124,7 +124,6 @@
     -webkit-box-decoration-break: clone;
   }
   
-  /* התאמה לשדה העריכה כדי שיציג נכון את הרקע */
   .editing-mode textarea {
     flex: 1;
     border: none;
@@ -139,6 +138,134 @@
     direction: rtl;
   }
   
+  /* דיאלוג אישור המחיקה */
+  .delete-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .delete-confirm-dialog {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    min-width: 420px; /* Wider to fit buttons better */
+    max-width: 90%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #ddd;
+    margin: 0;
+  }
+  
+  .delete-confirm-dialog h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .delete-confirm-dialog p {
+    margin-bottom: 30px; /* More space before buttons */
+    font-size: 18px;
+    color: #555;
+    line-height: 1.4;
+  }
+  
+  /* Fixed button layout based on the new image */
+  .delete-confirm-buttons {
+    display: flex;
+    justify-content: space-between; /* Space buttons evenly */
+    margin-top: 25px;
+    padding: 0 10px; /* Add some padding to the container */
+    gap: 12px; /* Consistent gap between buttons */
+  }
+  
+  .delete-confirm-buttons button {
+    padding: 12px 10px;
+    font-size: 15px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    min-height: 48px;
+    min-width: 110px; 
+    flex: 1; /* Make buttons take equal space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap; /* Prevent text wrapping */
+  }
+  
+  /* Match the order in the image */
+  .delete-confirm-buttons .cancel-button {
+    background-color: #9E9E9E;
+    color: white;
+    order: 1; /* Left button */
+  }
+  
+  .delete-confirm-buttons .delete-button {
+    background-color: #f44336;
+    color: white;
+    order: 2; /* Middle button */
+    flex: 1.4; /* Give more space to the middle button with longer text */
+  }
+  
+  .delete-confirm-buttons .save-button {
+    background-color: #4CAF50;
+    color: white;
+    order: 3; /* Right button */
+  }
+  
+  .delete-confirm-buttons .cancel-button:hover {
+    background-color: #757575;
+  }
+  
+  .delete-confirm-buttons .delete-button:hover {
+    background-color: #d32f2f;
+  }
+  
+  .delete-confirm-buttons .save-button:hover {
+    background-color: #3d9140;
+  }
+  
+  /* Media query for mobile devices */
+  @media (max-width: 480px) {
+    .delete-confirm-dialog {
+      min-width: 280px;
+      padding: 20px;
+    }
+    
+    .delete-confirm-buttons {
+      flex-direction: column; /* Stack buttons on small screens */
+    }
+    
+    .delete-confirm-buttons button {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   /* כפתור שמירה */
   .save-note-button {
     width: 24px;
@@ -158,6 +285,145 @@
   .save-note-button:hover {
     background-color: rgba(0, 0, 0, 0.1);
     color: rgba(0, 0, 0, 0.8);
+  }
+  .delete-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw; /* Use viewport width */
+    height: 100vh; /* Use viewport height */
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* Higher z-index to ensure it appears on top of everything */
+    animation: fadeIn 0.2s ease-out;
+    /* Make sure it covers the entire viewport */
+    margin: 0;
+    padding: 0;
+  }
+  
+  .delete-confirm-dialog {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    min-width: 350px; /* Slightly wider to accommodate larger buttons */
+    max-width: 90%;
+    animation: scaleIn 0.2s ease-out;
+    /* Position explicitly to ensure it's centered properly */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* Other styling */
+    border: 1px solid #ddd;
+    margin: 0; /* Reset any margins */
+  }
+  
+  .delete-confirm-dialog h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 24px; /* Larger heading */
+    font-weight: bold;
+  }
+  
+  .delete-confirm-dialog p {
+    margin-bottom: 20px;
+    font-size: 18px; /* Larger subtitle */
+    color: #555;
+    line-height: 1.4;
+  }
+  
+  .delete-confirm-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: stretch; /* Ensure all buttons have the same height */
+    gap: 12px;
+    margin-top: 25px;
+  }
+  
+  .delete-confirm-buttons button {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    min-width: 100px;
+    white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+  }
+  
+  /* Wider buttons */
+  .delete-confirm-buttons .save-button,
+  .delete-confirm-buttons .delete-button,
+  .delete-confirm-buttons .cancel-button {
+    width: 140px; /* Increased from 120px to 140px */
+  }
+  
+  .delete-confirm-buttons .save-button {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .delete-confirm-buttons .save-button:hover {
+    background-color: #3d9140;
+  }
+  
+  .delete-confirm-buttons .delete-button {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .delete-confirm-buttons .delete-button:hover {
+    background-color: #d32f2f;
+  }
+  
+  .delete-confirm-buttons .cancel-button {
+    background-color: #9E9E9E;
+    color: white;
+  }
+  
+  .delete-confirm-buttons .cancel-button:hover {
+    background-color: #757575;
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes scaleIn {
+    from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 480px) {
+    .delete-confirm-dialog {
+      min-width: 280px;
+      padding: 20px;
+    }
+    
+    .delete-confirm-buttons {
+      flex-direction: column;
+    }
+    
+    .delete-confirm-buttons button {
+      max-width: none;
+      width: 100%;
+      margin-bottom: 8px;
+    }
   }
   
   /* כפתור תפריט */

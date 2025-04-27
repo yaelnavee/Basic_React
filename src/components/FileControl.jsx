@@ -66,12 +66,9 @@ const FileControl = ({ onLoadNote, username, currentNote }) => {
   const handleDelete = (selectedFileName, event) => {
     // Stop propagation to prevent loading the file when clicking delete
     event.stopPropagation();
-    
-    if (window.confirm(`Are you sure you want to delete "${selectedFileName}"?`)) {
-      const fullKey = FILE_STORAGE_PREFIX + selectedFileName;
+    const fullKey = FILE_STORAGE_PREFIX + selectedFileName;
       localStorage.removeItem(fullKey);
       loadSavedFilesList(); // Refresh the list
-    }
   };
 
   return (

@@ -78,6 +78,11 @@ function App() {
   const handleSaveNote = () => {
     if (saveNoteData && saveFileName.trim()) {
       saveNoteToFile(saveFileName, saveNoteData);
+      
+      if (saveNoteData.deleteAfterSave) {
+        deleteNote(saveNoteData.id);
+      }
+      
       closeSaveDialog();
     }
   };
@@ -89,7 +94,7 @@ function App() {
     return (
       <div className="global-save-dialog-overlay" onClick={closeSaveDialog}>
         <div className="global-save-dialog" onClick={(e) => e.stopPropagation()}>
-          <h3>שמירת פתק</h3>
+          <h3>Save Note</h3>
           <input
             type="text"
             value={saveFileName}
@@ -98,8 +103,8 @@ function App() {
             autoFocus
           />
           <div className="dialog-buttons">
-            <button onClick={handleSaveNote} className="save-button">שמור</button>
-            <button onClick={closeSaveDialog} className="cancel-button">ביטול</button>
+            <button onClick={handleSaveNote} className="save-button">Save</button>
+            <button onClick={closeSaveDialog} className="cancel-button">Cancel</button>
           </div>
         </div>
       </div>
@@ -250,7 +255,7 @@ function App() {
                 
                 <div className="add-note-container">
                   <button onClick={addNote} className="add-note-button">
-                    + הוסף פתק חדש
+                    + Add Note
                   </button>
                 </div>
                 

@@ -426,3 +426,122 @@
   font-weight: bold;
   z-index: 1;
 }
+
+/* עיצוב להודעת דיאלוג השמירה */
+.save-dialog-message {
+  margin: 10px 0;
+  text-align: center;
+  color: #555;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+/* הוספת סגנון לכפתור ניטרלי */
+.global-save-dialog .neutral-button {
+  background-color: #9E9E9E;
+  color: white;
+}
+
+.global-save-dialog .neutral-button:hover {
+  background-color: #757575;
+}
+
+/* התאמת זרימת הכפתורים בדיאלוג */
+.global-save-dialog .dialog-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap; /* מאפשר שבירת שורה במסכים קטנים */
+}
+
+.global-save-dialog button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+  min-width: 120px; /* רוחב מינימלי לכפתורים */
+  font-size: 14px;
+}
+
+/* סגנון לדיאלוג שמירה עם כפתורים בשורה */
+.save-buttons-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.save-buttons-row button {
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 16px;
+}
+
+.global-save-dialog input {
+  padding: 12px;
+  border: 1px solid #4CAF50;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  direction: rtl;
+  font-weight: normal;
+  margin-top: 20px;
+}
+
+.global-save-dialog {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  width: 380px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease;
+}
+
+.global-save-dialog h3 {
+  margin: 0;
+  color: #333;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* עדכון צבעי כפתורים */
+.save-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.save-button:hover {
+  background-color: #3d9440;
+}
+
+.cancel-button {
+  background-color: #F44336;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #d32f2f;
+}
+
+.neutral-button {
+  background-color: #9E9E9E;
+  color: white;
+}
+
+.neutral-button:hover {
+  background-color: #7D7D7D;
+}

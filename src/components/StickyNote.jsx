@@ -1,5 +1,46 @@
 import React, { useState, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import './css/StickyNote.css'; 
+
+const DeleteConfirmDialog = ({ 
+  isOpen, 
+  onCancel, 
+  onConfirmDelete, 
+  onSaveBeforeDelete 
+}) => {
+  if (!isOpen) return null;
+  
+  // Handle keyboard events directly in the component
+  const handleKeyDown = (event) => {
+    if (event.key === 'Escape') {
+      onCancel();
+    }
+  };
+  
+  // Create portal to render at document body level
+  return ReactDOM.createPortal(
+    <div 
+      className="delete-confirm-overlay" 
+      onClick={onCancel}
+      onKeyDown={handleKeyDown}
+      tabIndex={-1}
+    >
+      <div 
+        className="delete-confirm-dialog" 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3>Delete Note</h3>
+        <p>Would you like to save the note before deleting?</p>
+        <div className="delete-confirm-buttons">
+          <button onClick={onCancel} className="cancel-button">Cancel</button>
+          <button onClick={onConfirmDelete} className="delete-button">Delete Without Saving</button>
+          <button onClick={onSaveBeforeDelete} className="save-button">Save to File</button>
+        </div>
+      </div>
+    </div>,
+    document.body // Mount to body element
+  );
+};
 
 const StickyNote = ({ 
   id, 
@@ -21,7 +62,7 @@ const StickyNote = ({
   username,
   notes 
 }) => {
-  //ברירת מחדל - מצב הפתק
+  // Default state
   const [text, setText] = useState(initialText || '');
   const [color, setColor] = useState(initialColor || 'yellow');
   const [fontFamily, setFontFamily] = useState(initialFontFamily || 'Arial, sans-serif'); 
@@ -29,53 +70,54 @@ const StickyNote = ({
   const [backgroundColor, setBackgroundColor] = useState(initialBackgroundColor || ''); 
   const [fontSize, setFontSize] = useState(initialFontSize || 16); 
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
-  // רפרנסים
+  // References
   const textareaRef = useRef(null);
   
-  // עדכון טקסט אם השתנה מבחוץ
+  // Update text if changed externally
   if (initialText !== undefined && initialText !== text) {
     setText(initialText);
   }
   
-  // עדכון צבע אם השתנה מבחוץ
+  // Update color if changed externally
   if (initialColor !== undefined && initialColor !== color) {
     setColor(initialColor);
   }
 
-  // עדכון פונט אם השתנה מבחוץ
+  // Update font if changed externally
   if (initialFontFamily !== undefined && initialFontFamily !== fontFamily) {
     setFontFamily(initialFontFamily);
   }
 
-  // עדכון גודל פונט אם השתנה מבחוץ
+  // Update font size if changed externally
   if (initialFontSize !== undefined && initialFontSize !== fontSize) {
     setFontSize(initialFontSize);
   }
   
-  // עדכון צבע טקסט אם השתנה מבחוץ
+  // Update text color if changed externally
   if (initialTextColor !== undefined && initialTextColor !== textColor) {
     setTextColor(initialTextColor);
   }
   
-  // עדכון צבע רקע אם השתנה מבחוץ
+  // Update background color if changed externally
   if (initialBackgroundColor !== undefined && initialBackgroundColor !== backgroundColor) {
     setBackgroundColor(initialBackgroundColor);
   }
 
-  // בחירת פתק
+  // Select note
   const handleClick = () => {
     onSelect?.(id);
   };
   
-  // עריכת פתק
+  // Edit note
   const handleDoubleClick = () => {
     setIsEditing(true);
     onSelect?.(id);
     setTimeout(() => textareaRef.current?.focus(), 10);
   };
   
-  // שמירת שינויים בפתק
+  // Save changes to note
   const handleSave = () => {
     setIsEditing(false);
     onUpdate?.(id, { 
@@ -89,7 +131,7 @@ const StickyNote = ({
     onEditEnd?.(id);
   };
   
-  // שינוי צבע הפתק
+  // Change note color
   const handleColorChange = (newColor) => {
     setColor(newColor);
     onUpdate?.(id, { 
@@ -102,16 +144,31 @@ const StickyNote = ({
     });
   };
   
-  // מחיקת פתק
-  const handleDelete = (e) => {
+  // Open delete confirmation dialog
+  const handleDeleteClick = (e) => {
     e.stopPropagation();
+    setShowDeleteConfirm(true);
+  };
+  
+  // Perform actual deletion
+  const confirmDelete = () => {
+    setShowDeleteConfirm(false);
     onDelete?.(id);
   };
   
-  // פתיחת דיאלוג שמירה - משתמש בפונקציה החדשה מהאפליקציה
-  const handleSaveClick = (e) => {
-    e.stopPropagation();
+  // Cancel deletion
+  const cancelDelete = (e) => {
+    if (e) e.stopPropagation();
+    setShowDeleteConfirm(false);
+  };
+  
+  // Save note before deletion
+  const saveBeforeDelete = (e) => {
+    if (e) e.stopPropagation();
+    
+    // Open global save dialog
     if (onSaveClick) {
+      // Send note object with additional property indicating to delete after saving
       onSaveClick({
         id,
         text,
@@ -119,28 +176,32 @@ const StickyNote = ({
         fontFamily,
         fontSize,
         textColor,
-        backgroundColor
+        backgroundColor,
+        deleteAfterSave: true // Mark for deletion after saving
       });
     }
+    
+    // Close delete confirmation dialog
+    setShowDeleteConfirm(false);
   };
   
   const renderTextWithCursor = () => {
     if (!isSelected || isEditing) {
-      // רנדור רגיל של טקסט עם רקע צבעוני אם הוגדר
+      // Regular text rendering with colored background if defined
       if (backgroundColor) {
         return (
           <span 
             className="text-with-background" 
             style={{
               backgroundColor: backgroundColor,
-              color: textColor // חשוב - צבע הטקסט מועבר כאן
+              color: textColor // Important - text color is applied here
             }}
           >
             {text}
           </span>
         );
       }
-      // רנדור טקסט רגיל ללא רקע אבל עם צבע טקסט
+      // Regular text rendering without background but with text color
       return (
         <span style={{ color: textColor }}>
           {text}
@@ -148,7 +209,7 @@ const StickyNote = ({
       );
     }
     
-    // רנדור טקסט עם סמן
+    // Render text with cursor
     if (backgroundColor) {
       return (
         <>
@@ -176,66 +237,75 @@ const StickyNote = ({
     );
   };
 
-  // יצירת סגנון עבור תוכן הפתק, כולל פונט וגודל פונט
+  // Create style for note content, including font and font size
   const noteContentStyle = {
     fontFamily: fontFamily,
     fontSize: `${fontSize}px`,
   };
 
   return (
-    <div 
-      className={`sticky-note ${color} ${isSelected ? 'selected' : ''}`}
-      onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
-    >
-      {isEditing ? (
-        <div className="editing-mode">
-          <textarea
-            ref={textareaRef}
-            value={text}
-            style={{
-              ...noteContentStyle,
-              color: textColor,
-              backgroundColor: backgroundColor || 'transparent'
-            }}
-            onChange={(e) => {
-              setText(e.target.value);
-              onUpdate?.(id, { 
-                text: e.target.value, 
-                color,
-                fontFamily,
-                fontSize,
-                textColor,
-                backgroundColor
-              });
-            }}
-            autoFocus
-          />
-          <div className="note-toolbar">
-            <div className="color-options">
-              {['yellow', 'green', 'pink', 'blue'].map(colorOption => (
-                <button 
-                  key={colorOption}
-                  className={`color-option ${colorOption}`} 
-                  onClick={() => handleColorChange(colorOption)}
-                />
-              ))}
+    <>
+      <div 
+        className={`sticky-note ${color} ${isSelected ? 'selected' : ''}`}
+        onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
+      >
+        {isEditing ? (
+          <div className="editing-mode">
+            <textarea
+              ref={textareaRef}
+              value={text}
+              style={{
+                ...noteContentStyle,
+                color: textColor,
+                backgroundColor: backgroundColor || 'transparent'
+              }}
+              onChange={(e) => {
+                setText(e.target.value);
+                onUpdate?.(id, { 
+                  text: e.target.value, 
+                  color,
+                  fontFamily,
+                  fontSize,
+                  textColor,
+                  backgroundColor
+                });
+              }}
+              autoFocus
+            />
+            <div className="note-toolbar">
+              <div className="color-options">
+                {['yellow', 'green', 'pink', 'blue'].map(colorOption => (
+                  <button 
+                    key={colorOption}
+                    className={`color-option ${colorOption}`} 
+                    onClick={() => handleColorChange(colorOption)}
+                  />
+                ))}
+              </div>
+              <button className="save-button" onClick={handleSave}>Save</button>
             </div>
-            <button className="save-button" onClick={handleSave}>שמור</button>
           </div>
-        </div>
-      ) : (
-        <>
-          <div className="note-content-wrapper" style={noteContentStyle}>
-            {renderTextWithCursor()}
-          </div>
-          <div className="note-buttons">
-            <button className="save-note-button" onClick={handleSaveClick} title="שמור פתק לקובץ">💾</button>
-            <button className="delete-button" onClick={handleDelete} title="מחק פתק">X</button>
-          </div>
-        </>
-      )}
-    </div>
+        ) : (
+          <>
+            <div className="note-content-wrapper" style={noteContentStyle}>
+              {renderTextWithCursor()}
+            </div>
+            <div className="note-buttons">
+              <button className="delete-button" onClick={handleDeleteClick} title="Delete Note">X</button>
+            </div>
+          </>
+        )}
+      </div>
+      
+      {/* Render delete dialog as a portal */}
+      <DeleteConfirmDialog 
+        isOpen={showDeleteConfirm}
+        onCancel={cancelDelete}
+        onConfirmDelete={confirmDelete}
+        onSaveBeforeDelete={saveBeforeDelete}
+      />
+    </>
   );
 };
 

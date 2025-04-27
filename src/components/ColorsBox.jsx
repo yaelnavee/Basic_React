@@ -62,7 +62,7 @@ const ColorsBox = ({ onColorChange, onBgColorChange, selectedTextColor, selected
 
   return (
     <div className="colors-box">
-      <h3>צבע טקסט:</h3>
+      <h3> Text color:</h3>
       <div className="colors-options">
         {COLORS.map((color) => (
           <div
@@ -74,7 +74,7 @@ const ColorsBox = ({ onColorChange, onBgColorChange, selectedTextColor, selected
           />
         ))}
       </div>
-      <h3>הדגשת טקסט:</h3>
+      <h3>Text background color:</h3>
       <div className="colors-options">
         {BG_COLORS.map((color) => (
           <div
