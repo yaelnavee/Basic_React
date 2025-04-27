@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './css/FontsBox.css';
 
 const FontsBox = ({ onFontChange, selectedFont, selectedSize }) => {
@@ -12,35 +12,34 @@ const FontsBox = ({ onFontChange, selectedFont, selectedSize }) => {
 
     const [sizes] = useState([12, 14, 16, 18, 20, 24, 28, 32]);
     
-    // מעקב אחרי הפונט הנבחר וגודל הפונט הנבחר במצב פנימי
+    // Track selected font and font size in internal state
     const [activeFontValue, setActiveFontValue] = useState(selectedFont || fonts[0].value);
     const [activeSizeValue, setActiveSizeValue] = useState(selectedSize || 16);
 
-    // עדכון הערכים הפנימיים כאשר Props משתנים
-    useEffect(() => {
-        if (selectedFont) {
-            setActiveFontValue(selectedFont);
-        }
-        if (selectedSize) {
-            setActiveSizeValue(selectedSize);
-        }
-    }, [selectedFont, selectedSize]);
+    // Update internal values if props change
+    if (selectedFont && selectedFont !== activeFontValue) {
+        setActiveFontValue(selectedFont);
+    }
+    
+    if (selectedSize && selectedSize !== activeSizeValue) {
+        setActiveSizeValue(selectedSize);
+    }
 
     const handleFontChange = (font) => {
-        // עדכון המצב הפנימי
+        // Update internal state
         setActiveFontValue(font);
         
-        // קריאה לפונקציה שהועברה מבחוץ
+        // Call external function
         if (onFontChange) {
             onFontChange(font);
         }
     };
 
     const handleSizeChange = (size) => {
-        // עדכון המצב הפנימי
+        // Update internal state
         setActiveSizeValue(size);
         
-        // קריאה לפונקציה שהועברה מבחוץ
+        // Call external function
         if (onFontChange) {
             onFontChange(size);
         }

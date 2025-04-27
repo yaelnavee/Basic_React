@@ -11,25 +11,25 @@ import ColorsBox from './components/ColorsBox.jsx';
 import './App.css';
 
 function App() {
-  // מצב משתמש
+  // User state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState('');
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [userImage, setUserImage] = useState(null);
   
-  // מצב פתקים
+  // Notes state
   const [selectedNoteId, setSelectedNoteId] = useState(null);
   const [lastUpdatedId, setLastUpdatedId] = useState(null);
   
-  // מצב דיאלוגים
+  // Dialog state
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   
-  // מצב דיאלוג שמירה גלובלי
+  // Global save dialog state
   const [showGlobalSaveDialog, setShowGlobalSaveDialog] = useState(false);
   const [saveFileName, setSaveFileName] = useState('');
   const [saveNoteData, setSaveNoteData] = useState(null);
 
-  // שימוש במנהל הפתקים
+  // Use notes manager
   const {
     notes,
     addNote,
@@ -51,15 +51,15 @@ function App() {
     setLastUpdatedId
   });
 
-  // קבלת הפתק הנבחר הנוכחי
+  // Get current selected note
   const getCurrentNote = () => {
     if (selectedNoteId === null) return null;
     return notes.find(note => note.id === selectedNoteId) || null;
   };
 
-  // פונקציות לניהול דיאלוג שמירה גלובלי
+  // Global save dialog management functions
   const openSaveDialog = (noteData) => {
-    // הכן שם קובץ ברירת מחדל
+    // Prepare default file name
     const defaultName = noteData.text 
       ? noteData.text.trim().split(/\s+/).slice(0, 3).join('_') || `note_${noteData.id}`
       : `note_${noteData.id}`;
@@ -87,7 +87,7 @@ function App() {
     }
   };
 
-  // רינדור דיאלוג השמירה הגלובלי
+  // Render global save dialog
   const renderSaveDialog = () => {
     if (!showGlobalSaveDialog) return null;
 
@@ -99,21 +99,21 @@ function App() {
             type="text"
             value={saveFileName}
             onChange={(e) => setSaveFileName(e.target.value)}
-            placeholder="הזן שם לקובץ"
+            placeholder="Enter file name"
             autoFocus
           />
-          <div className="dialog-buttons">
-            <button onClick={handleSaveNote} className="save-button">Save</button>
+          <div className="save-buttons-row">
             <button onClick={closeSaveDialog} className="cancel-button">Cancel</button>
+            <button onClick={handleSaveNote} className="save-button">Save</button>
           </div>
         </div>
       </div>
     );
   };
 
-  // טיפול בלחיצה על מקש במקלדת הווירטואלית
+  // Handle virtual keyboard key press
   const handleVirtualKeyPress = (key) => {
-    // אם דיאלוג השמירה פתוח, טפל בשדה שם הקובץ
+    // If save dialog is open, handle file name input
     if (showGlobalSaveDialog) {
       switch (key) {
         case 'Del':
@@ -137,68 +137,58 @@ function App() {
           break;
       }
     } 
-    // אחרת, טפל בטקסט הפתק הרגיל
+    // Otherwise, handle note text input
     else if (selectedNoteId !== null) {
       updateSelectedNoteText(key);
     }
   };
 
-  //  פונקציה לטיפול בשינוי פונט
+  // Font style change handler
   const handleFontStyleChange = (style) => {
     if (selectedNoteId !== null) {
       if (typeof style === 'number') {
-        // אם זה מספר, זה גודל פונט
+        // If it's a number, it's a font size
         updateNote(selectedNoteId, { fontSize: style });
-        console.log(`Changed font size to ${style}px for note ${selectedNoteId}`);
       } else {
-        // אחרת זה פונט
+        // Otherwise it's a font family
         updateNote(selectedNoteId, { fontFamily: style });
-        console.log(`Changed font family to ${style} for note ${selectedNoteId}`);
       }
-      // סימון הפתק כעודכן לאחרונה
+      // Mark the note as last updated
       setLastUpdatedId(selectedNoteId);
-    } else {
-      console.log("No note selected for font style change");
     }
   };
 
-  // הוסף פונקציה לשינוי צבע
+  // Color change handler
   const handleColorChange = (color) => {
     if (selectedNoteId !== null) {
       updateNote(selectedNoteId, { color });
     }
   };
 
-  // פונקציה לטיפול בשינוי צבע הטקסט
+  // Text color change handler
   const handleTextColorChange = (color) => {
     if (selectedNoteId !== null) {
       updateNote(selectedNoteId, { textColor: color });
-      console.log(`Changed text color to ${color} for note ${selectedNoteId}`);
-      // סימון הפתק כעודכן לאחרונה
+      // Mark the note as last updated
       setLastUpdatedId(selectedNoteId);
-    } else {
-      console.log("No note selected for text color change");
     }
   };
 
-  // פונקציה לטיפול בשינוי צבע הרקע
+  // Background color change handler
   const handleBackgroundColorChange = (color) => {
     if (selectedNoteId !== null) {
       updateNote(selectedNoteId, { backgroundColor: color });
-      console.log(`Changed text background color to ${color} for note ${selectedNoteId}`);
-      // סימון הפתק כעודכן לאחרונה
+      // Mark the note as last updated
       setLastUpdatedId(selectedNoteId);
-    } else {
-      console.log("No note selected for text background color change");
     }
   };
 
-  // טיפול בכניסה למערכת
+  // Login handler
   const handleLogin = (username) => {
     setIsAuthenticated(true);
     setUsername(username);
 
-    // טען פתקים מהסטורג' לפי המפתח הנכון
+    // Load notes from storage by the correct key
     const saved = localStorage.getItem(`stickyNotes_${username}`);
     if (saved) {
       const parsedNotes = JSON.parse(saved);
@@ -206,7 +196,7 @@ function App() {
     }
   };
 
-  // טיפול ביציאה מהמערכת
+  // Logout handler
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUsername('');
@@ -214,10 +204,10 @@ function App() {
     setLastUpdatedId(null);
   };
 
-  // רישום למקלדת פיזית
+  // Register for physical keyboard events
   if (typeof document !== 'undefined') {
     document.onkeydown = (event) => {
-      // אם דיאלוג השמירה הגלובלי פתוח, טפל בלחיצת מקשים
+      // If global save dialog is open, handle key presses
       if (showGlobalSaveDialog) {
         if (event.key === 'Enter') {
           handleSaveNote();
@@ -226,11 +216,11 @@ function App() {
           closeSaveDialog();
           event.preventDefault();
         }
-        // לשאר המקשים, נאפשר התנהגות רגילה באינפוט
+        // For other keys, allow normal input behavior
         return;
       }
       
-      // אחרת, נעביר את המקש לפתק
+      // Otherwise, pass the key to the note
       if (selectedNoteId !== null) {
         updateSelectedNoteText(event.key);
       }

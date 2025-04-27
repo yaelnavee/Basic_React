@@ -1,46 +1,5 @@
 import React, { useState, useRef } from 'react';
-import ReactDOM from 'react-dom';
 import './css/StickyNote.css'; 
-
-const DeleteConfirmDialog = ({ 
-  isOpen, 
-  onCancel, 
-  onConfirmDelete, 
-  onSaveBeforeDelete 
-}) => {
-  if (!isOpen) return null;
-  
-  // Handle keyboard events directly in the component
-  const handleKeyDown = (event) => {
-    if (event.key === 'Escape') {
-      onCancel();
-    }
-  };
-  
-  // Create portal to render at document body level
-  return ReactDOM.createPortal(
-    <div 
-      className="delete-confirm-overlay" 
-      onClick={onCancel}
-      onKeyDown={handleKeyDown}
-      tabIndex={-1}
-    >
-      <div 
-        className="delete-confirm-dialog" 
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3>Delete Note</h3>
-        <p>Would you like to save the note before deleting?</p>
-        <div className="delete-confirm-buttons">
-          <button onClick={onCancel} className="cancel-button">Cancel</button>
-          <button onClick={onConfirmDelete} className="delete-button">Delete Without Saving</button>
-          <button onClick={onSaveBeforeDelete} className="save-button">Save to File</button>
-        </div>
-      </div>
-    </div>,
-    document.body // Mount to body element
-  );
-};
 
 const StickyNote = ({ 
   id, 
@@ -62,7 +21,7 @@ const StickyNote = ({
   username,
   notes 
 }) => {
-  // Default state
+  // States
   const [text, setText] = useState(initialText || '');
   const [color, setColor] = useState(initialColor || 'yellow');
   const [fontFamily, setFontFamily] = useState(initialFontFamily || 'Arial, sans-serif'); 
@@ -72,35 +31,25 @@ const StickyNote = ({
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
-  // References
+  // Refs
   const textareaRef = useRef(null);
   
-  // Update text if changed externally
+  // Update values if props change
   if (initialText !== undefined && initialText !== text) {
     setText(initialText);
   }
-  
-  // Update color if changed externally
   if (initialColor !== undefined && initialColor !== color) {
     setColor(initialColor);
   }
-
-  // Update font if changed externally
   if (initialFontFamily !== undefined && initialFontFamily !== fontFamily) {
     setFontFamily(initialFontFamily);
   }
-
-  // Update font size if changed externally
   if (initialFontSize !== undefined && initialFontSize !== fontSize) {
     setFontSize(initialFontSize);
   }
-  
-  // Update text color if changed externally
   if (initialTextColor !== undefined && initialTextColor !== textColor) {
     setTextColor(initialTextColor);
   }
-  
-  // Update background color if changed externally
   if (initialBackgroundColor !== undefined && initialBackgroundColor !== backgroundColor) {
     setBackgroundColor(initialBackgroundColor);
   }
@@ -117,7 +66,7 @@ const StickyNote = ({
     setTimeout(() => textareaRef.current?.focus(), 10);
   };
   
-  // Save changes to note
+  // Save note changes
   const handleSave = () => {
     setIsEditing(false);
     onUpdate?.(id, { 
@@ -150,7 +99,7 @@ const StickyNote = ({
     setShowDeleteConfirm(true);
   };
   
-  // Perform actual deletion
+  // Confirm deletion
   const confirmDelete = () => {
     setShowDeleteConfirm(false);
     onDelete?.(id);
@@ -168,7 +117,7 @@ const StickyNote = ({
     
     // Open global save dialog
     if (onSaveClick) {
-      // Send note object with additional property indicating to delete after saving
+      // Send note object with flag to delete after save
       onSaveClick({
         id,
         text,
@@ -177,7 +126,7 @@ const StickyNote = ({
         fontSize,
         textColor,
         backgroundColor,
-        deleteAfterSave: true // Mark for deletion after saving
+        deleteAfterSave: true // Flag to delete after saving
       });
     }
     
@@ -187,14 +136,14 @@ const StickyNote = ({
   
   const renderTextWithCursor = () => {
     if (!isSelected || isEditing) {
-      // Regular text rendering with colored background if defined
+      // Regular text rendering with background color if defined
       if (backgroundColor) {
         return (
           <span 
             className="text-with-background" 
             style={{
               backgroundColor: backgroundColor,
-              color: textColor // Important - text color is applied here
+              color: textColor
             }}
           >
             {text}
@@ -209,7 +158,7 @@ const StickyNote = ({
       );
     }
     
-    // Render text with cursor
+    // Text rendering with cursor
     if (backgroundColor) {
       return (
         <>
@@ -243,69 +192,80 @@ const StickyNote = ({
     fontSize: `${fontSize}px`,
   };
 
-  return (
-    <>
-      <div 
-        className={`sticky-note ${color} ${isSelected ? 'selected' : ''}`}
-        onClick={handleClick}
-        onDoubleClick={handleDoubleClick}
-      >
-        {isEditing ? (
-          <div className="editing-mode">
-            <textarea
-              ref={textareaRef}
-              value={text}
-              style={{
-                ...noteContentStyle,
-                color: textColor,
-                backgroundColor: backgroundColor || 'transparent'
-              }}
-              onChange={(e) => {
-                setText(e.target.value);
-                onUpdate?.(id, { 
-                  text: e.target.value, 
-                  color,
-                  fontFamily,
-                  fontSize,
-                  textColor,
-                  backgroundColor
-                });
-              }}
-              autoFocus
-            />
-            <div className="note-toolbar">
-              <div className="color-options">
-                {['yellow', 'green', 'pink', 'blue'].map(colorOption => (
-                  <button 
-                    key={colorOption}
-                    className={`color-option ${colorOption}`} 
-                    onClick={() => handleColorChange(colorOption)}
-                  />
-                ))}
-              </div>
-              <button className="save-button" onClick={handleSave}>Save</button>
-            </div>
+  // Render delete confirmation dialog
+  const renderDeleteConfirmDialog = () => {
+    if (!showDeleteConfirm) return null;
+    
+    return (
+      <div className="global-save-dialog-overlay" onClick={cancelDelete}>
+        <div className="global-save-dialog delete-dialog" onClick={(e) => e.stopPropagation()}>
+          <h3>Delete Note</h3>
+          <div className="save-buttons-row compact-buttons">
+            <button onClick={cancelDelete} className="neutral-button">Cancel</button>
+            <button onClick={confirmDelete} className="cancel-button">Delete</button>
+            <button onClick={saveBeforeDelete} className="save-button">Save to File</button>
           </div>
-        ) : (
-          <>
-            <div className="note-content-wrapper" style={noteContentStyle}>
-              {renderTextWithCursor()}
-            </div>
-            <div className="note-buttons">
-              <button className="delete-button" onClick={handleDeleteClick} title="Delete Note">X</button>
-            </div>
-          </>
-        )}
+        </div>
       </div>
+    );
+  };
+
+  return (
+    <div 
+      className={`sticky-note ${color} ${isSelected ? 'selected' : ''}`}
+      onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
+    >
+      {isEditing ? (
+        <div className="editing-mode">
+          <textarea
+            ref={textareaRef}
+            value={text}
+            style={{
+              ...noteContentStyle,
+              color: textColor,
+              backgroundColor: backgroundColor || 'transparent'
+            }}
+            onChange={(e) => {
+              setText(e.target.value);
+              onUpdate?.(id, { 
+                text: e.target.value, 
+                color,
+                fontFamily,
+                fontSize,
+                textColor,
+                backgroundColor
+              });
+            }}
+            autoFocus
+          />
+          <div className="note-toolbar">
+            <div className="color-options">
+              {['yellow', 'green', 'pink', 'blue'].map(colorOption => (
+                <button 
+                  key={colorOption}
+                  className={`color-option ${colorOption}`} 
+                  onClick={() => handleColorChange(colorOption)}
+                />
+              ))}
+            </div>
+            <button className="save-button" onClick={handleSave}>Save</button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="note-content-wrapper" style={noteContentStyle}>
+            {renderTextWithCursor()}
+          </div>
+          <div className="note-buttons">
+            <button className="delete-button" onClick={handleDeleteClick} title="Delete note">X</button>
+          </div>
+        </>
+      )}
       
-      {/* Render delete dialog as a portal */}
-      <DeleteConfirmDialog 
-        isOpen={showDeleteConfirm}
-        onCancel={cancelDelete}
-        onConfirmDelete={confirmDelete}
-        onSaveBeforeDelete={saveBeforeDelete}
-      />
-    </>
+      {/* Delete confirmation dialog */}
+      {renderDeleteConfirmDialog()}
+    </div>
   );
 };
 

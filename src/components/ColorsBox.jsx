@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./css/ColorsBox.css";
 
 const COLORS = [
@@ -23,25 +23,18 @@ const BG_COLORS = [
   "#FF5722", // Deep Orange
   "#E91E63", // Pink
   "#9C27B0", // Purple
-  "#FFFFFF", // White - שקוף (ללא רקע)
+  "#FFFFFF", // White - transparent (no background)
 ];
 
 const ColorsBox = ({ onColorChange, onBgColorChange, selectedTextColor, selectedBgColor }) => {
-  // מצב פנימי לצבעים הנבחרים
+  // Initialize state with the prop value or default
   const [activeTextColor, setActiveTextColor] = useState(selectedTextColor || "#222222");
   const [activeBgColor, setActiveBgColor] = useState(selectedBgColor || "");
 
-  // עדכון המצב הפנימי כאשר props משתנים
-  useEffect(() => {
-    if (selectedTextColor) {
-      setActiveTextColor(selectedTextColor);
-    }
-    if (selectedBgColor) {
-      setActiveBgColor(selectedBgColor);
-    }
-  }, [selectedTextColor, selectedBgColor]);
+  // REMOVE the conditional state updates from here!
+  // Don't have any setState calls in the component body
 
-  // טיפול בשינוי צבע טקסט
+  // Handle text color change
   const handleTextColorClick = (color) => {
     setActiveTextColor(color);
     if (onColorChange) {
@@ -49,9 +42,9 @@ const ColorsBox = ({ onColorChange, onBgColorChange, selectedTextColor, selected
     }
   };
 
-  // טיפול בשינוי צבע רקע לטקסט (מדגיש את הטקסט)
+  // Handle text background color change (highlights text)
   const handleBgColorClick = (color) => {
-    // אם לוחצים על לבן, מבטלים את הרקע
+    // If clicking white, remove the background
     const selectedColor = color === "#FFFFFF" ? "" : color;
     
     setActiveBgColor(selectedColor);
@@ -62,12 +55,12 @@ const ColorsBox = ({ onColorChange, onBgColorChange, selectedTextColor, selected
 
   return (
     <div className="colors-box">
-      <h3> Text color:</h3>
+      <h3>Text color:</h3>
       <div className="colors-options">
         {COLORS.map((color) => (
           <div
             key={color}
-            className={`color-item ${color === activeTextColor ? 'active' : ''}`}
+            className={`color-item ${color === (selectedTextColor || activeTextColor) ? 'active' : ''}`}
             style={{ backgroundColor: color }}
             onClick={() => handleTextColorClick(color)}
             title={color}
@@ -79,10 +72,10 @@ const ColorsBox = ({ onColorChange, onBgColorChange, selectedTextColor, selected
         {BG_COLORS.map((color) => (
           <div
             key={color}
-            className={`color-item ${color === activeBgColor ? 'active' : ''}`}
+            className={`color-item ${color === (selectedBgColor || activeBgColor) ? 'active' : ''}`}
             style={{ backgroundColor: color }}
             onClick={() => handleBgColorClick(color)}
-            title={color === "#FFFFFF" ? "ללא הדגשה" : color}
+            title={color === "#FFFFFF" ? "No highlight" : color}
           />
         ))}
       </div>

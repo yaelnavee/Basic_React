@@ -190,10 +190,146 @@
   border: 1px solid #e0e0e0;
 }
 
+/* עיצוב דיאלוג שמירה גלובלי */
+.global-save-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.global-save-dialog {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  width: 380px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease;
+}
+
+.global-save-dialog h3 {
+  margin: 0;
+  color: #333;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.global-save-dialog input {
+  padding: 12px;
+  border: 1px solid #4CAF50;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  font-weight: normal;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.global-save-dialog input:focus {
+  outline: 2px solid #4CAF50;
+  border-color: #4CAF50;
+}
+
+/* Button styles */
+.save-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.save-button:hover {
+  background-color: #3d9440;
+}
+
+.cancel-button {
+  background-color: #F44336;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #d32f2f;
+}
+
+.neutral-button {
+  background-color: #9E9E9E;
+  color: white;
+}
+
+.neutral-button:hover {
+  background-color: #7D7D7D;
+}
+
+/* Button row styling */
+.save-buttons-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
+
+.save-buttons-row button {
+  flex: 1;
+  padding: 12px 0;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 16px;
+}
+
+/* Message in dialog */
+.save-dialog-message {
+  margin: 10px 0;
+  text-align: center;
+  color: #555;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+/* אנימציה לדיאלוג */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* הדגשה ויזואלית למקלדת בעת שמירה */
+.keyboard-save-mode .keyboard-row {
+  border: 3px solid #4CAF50;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+  position: relative;
+}
+
+.keyboard-save-mode .keyboard-row::before {
+  content: "Keyboard in file name input mode";
+  position: absolute;
+  top: -30px;
+  right: 10px;
+  background-color: #4CAF50;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 1;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .grid-container {
-    grid-template-rows: 3fr 1fr; /* Adjusted ratio for better visibility */
+    grid-template-rows: 3fr 1fr;
     height: 100vh;
     gap: 10px;
     padding: 10px;
@@ -204,15 +340,15 @@
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
     gap: 10px;
-    min-height: 0; /* Important for overflow handling */
-    max-height: 65vh; /* Ensure notes container has enough height */
+    min-height: 0;
+    max-height: 65vh;
   }
 
   .notes-display-area {
     grid-row: 2;
     overflow-y: auto;
-    min-height: 200px; /* Minimum height to ensure visibility */
-    max-height: calc(65vh - 80px); /* Subtract header height */
+    min-height: 200px;
+    max-height: calc(65vh - 80px);
     padding: 5px;
   }
 
@@ -221,16 +357,15 @@
     grid-template-rows: repeat(2, auto);
     gap: 5px;
     padding: 5px;
-    max-height: 25vh; /* Keyboard height limit */
+    max-height: 25vh;
   }
 
   .keyboard-component {
     grid-column: 1 / span 2;
     grid-row: 2;
-    max-height: 15vh; /* Keyboard component height limit */
+    max-height: 15vh;
   }
 
-  /* Note size adjustments */
   .sticky-note {
     min-width: 140px;
     min-height: 140px;
@@ -238,7 +373,6 @@
     padding: 10px;
   }
 
-  /* Sidebar adjustments */
   .sidebar {
     flex-direction: row;
     justify-content: space-between;
@@ -260,7 +394,7 @@
 /* Very small screens */
 @media (max-width: 480px) {
   .grid-container {
-    grid-template-rows: 2.5fr 1fr; /* Adjusted ratio */
+    grid-template-rows: 2.5fr 1fr;
     padding: 5px;
   }
 
@@ -290,7 +424,7 @@
 
   .sidebar {
     padding: 3px;
-    flex-direction: column; /* Stack elements vertically on very small screens */
+    flex-direction: column;
     gap: 5px;
   }
 
@@ -308,240 +442,4 @@
     width: 100%;
     margin: 2px 0;
   }
-}
-
-/* עיצוב דיאלוג שמירה גלובלי */
-.global-save-dialog-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  direction: rtl;
-}
-
-.global-save-dialog {
-  background-color: white;
-  border-radius: 8px;
-  padding: 24px;
-  width: 350px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  animation: fadeIn 0.3s ease;
-  position: relative;
-  top: -50px; /* הזז קצת למעלה כדי להיות יותר במרכז המסך */
-}
-
-.global-save-dialog h3 {
-  margin: 0;
-  color: #333;
-  text-align: center;
-  font-weight: bold;
-  font-size: 18px;
-}
-
-.global-save-dialog input {
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-  width: 100%;
-  box-sizing: border-box;
-  direction: rtl;
-  font-weight: bold;
-}
-
-.global-save-dialog input:focus {
-  outline: 2px solid #4CAF50;
-  border-color: #4CAF50;
-}
-
-.global-save-dialog .dialog-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 10px;
-}
-
-.global-save-dialog button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
-  min-width: 80px;
-  font-size: 14px;
-}
-
-.global-save-dialog .save-button {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.global-save-dialog .save-button:hover {
-  background-color: #388E3C;
-}
-
-.global-save-dialog .cancel-button {
-  background-color: #F44336;
-  color: white;
-}
-
-.global-save-dialog .cancel-button:hover {
-  background-color: #D32F2F;
-}
-
-/* אנימציה לדיאלוג */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* הדגשה ויזואלית למקלדת בעת שמירה */
-.keyboard-save-mode .keyboard-row {
-  border: 3px solid #4CAF50;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
-  position: relative;
-}
-
-.keyboard-save-mode .keyboard-row::before {
-  content: "מקלדת במצב הזנת שם קובץ";
-  position: absolute;
-  top: -30px;
-  right: 10px;
-  background-color: #4CAF50;
-  color: white;
-  padding: 5px 15px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: bold;
-  z-index: 1;
-}
-
-/* עיצוב להודעת דיאלוג השמירה */
-.save-dialog-message {
-  margin: 10px 0;
-  text-align: center;
-  color: #555;
-  font-size: 16px;
-  font-weight: normal;
-}
-
-/* הוספת סגנון לכפתור ניטרלי */
-.global-save-dialog .neutral-button {
-  background-color: #9E9E9E;
-  color: white;
-}
-
-.global-save-dialog .neutral-button:hover {
-  background-color: #757575;
-}
-
-/* התאמת זרימת הכפתורים בדיאלוג */
-.global-save-dialog .dialog-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
-  flex-wrap: wrap; /* מאפשר שבירת שורה במסכים קטנים */
-}
-
-.global-save-dialog button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
-  min-width: 120px; /* רוחב מינימלי לכפתורים */
-  font-size: 14px;
-}
-
-/* סגנון לדיאלוג שמירה עם כפתורים בשורה */
-.save-buttons-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 20px;
-  gap: 10px;
-}
-
-.save-buttons-row button {
-  width: 100%;
-  padding: 12px 0;
-  border: none;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  font-size: 16px;
-}
-
-.global-save-dialog input {
-  padding: 12px;
-  border: 1px solid #4CAF50;
-  border-radius: 4px;
-  font-size: 16px;
-  width: 100%;
-  box-sizing: border-box;
-  direction: rtl;
-  font-weight: normal;
-  margin-top: 20px;
-}
-
-.global-save-dialog {
-  background-color: white;
-  border-radius: 8px;
-  padding: 20px;
-  width: 380px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  animation: fadeIn 0.3s ease;
-}
-
-.global-save-dialog h3 {
-  margin: 0;
-  color: #333;
-  text-align: center;
-  font-weight: bold;
-  font-size: 18px;
-}
-
-/* עדכון צבעי כפתורים */
-.save-button {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.save-button:hover {
-  background-color: #3d9440;
-}
-
-.cancel-button {
-  background-color: #F44336;
-  color: white;
-}
-
-.cancel-button:hover {
-  background-color: #d32f2f;
-}
-
-.neutral-button {
-  background-color: #9E9E9E;
-  color: white;
-}
-
-.neutral-button:hover {
-  background-color: #7D7D7D;
 }

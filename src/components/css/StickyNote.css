@@ -107,6 +107,48 @@
     display: inline; /* שינוי חשוב - מאפשר לרקע להתאים רק לטקסט */
   }
   
+  /* עיצוב כללי לדיאלוג */
+.delete-dialog {
+    width: 280px !important; /* רוחב קבוע */
+    padding: 14px !important; /* פדינג קטן יותר */
+    border: 1px solid #ddd;
+  }
+  
+  /* כותרת דיאלוג המחיקה */
+  .delete-dialog h3 {
+    margin-bottom: 10px !important;
+  }
+  
+  /* כפתורים קטנים יותר בגובה עבור דיאלוג המחיקה */
+  .compact-buttons button {
+    padding: 6px 0 !important; /* גובה מוקטן מאוד */
+    font-size: 14px !important; /* גודל פונט קטן יותר */
+    font-weight: bold;
+    border-radius: 4px;
+  }
+  
+  /* שיפור המראה של הכפתורים */
+  .compact-buttons {
+    gap: 6px !important; /* מרווח קטן יותר בין הכפתורים */
+  }
+  
+  /* צבעי כפתורים עם אפקט הבהרה בעת מעבר עכבר */
+  .compact-buttons .neutral-button {
+    background-color: #9E9E9E;
+  }
+  
+  .compact-buttons .cancel-button {
+    background-color: #F44336;
+  }
+  
+  .compact-buttons .save-button {
+    background-color: #4CAF50;
+  }
+  
+  .compact-buttons button:hover {
+    filter: brightness(1.1); /* אפקט הבהרה בעת מעבר עכבר */
+  }
+  
   /* עיצוב לטקסט עם רקע צבעוני */
   .note-content-wrapper {
     min-height: 170px;
