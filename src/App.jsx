@@ -180,11 +180,11 @@ function App() {
   const handleBackgroundColorChange = (color) => {
     if (selectedNoteId !== null) {
       updateNote(selectedNoteId, { backgroundColor: color });
-      console.log(`Changed background color to ${color} for note ${selectedNoteId}`);
+      console.log(`Changed text background color to ${color} for note ${selectedNoteId}`);
       // סימון הפתק כעודכן לאחרונה
       setLastUpdatedId(selectedNoteId);
     } else {
-      console.log("No note selected for background color change");
+      console.log("No note selected for text background color change");
     }
   };
 

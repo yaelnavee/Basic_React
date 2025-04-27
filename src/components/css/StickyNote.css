@@ -94,6 +94,51 @@
     color: rgba(0, 0, 0, 0.8);
   }
 
+  .note-content {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 170px;
+    padding: 25px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    direction: rtl;
+    transition: font-family 0.3s, font-size 0.3s;
+    display: inline; /* שינוי חשוב - מאפשר לרקע להתאים רק לטקסט */
+  }
+  
+  /* עיצוב לטקסט עם רקע צבעוני */
+  .note-content-wrapper {
+    min-height: 170px;
+    padding: 25px;
+    word-break: break-word;
+  }
+  
+  /* סגנון להדגשת טקסט עם רקע */
+  .text-with-background {
+    display: inline;
+    padding: 2px 4px; /* מרווח קטן סביב הטקסט */
+    line-height: 1.7; /* מרווח בין שורות כדי שהרקע ייראה טוב */
+    border-radius: 3px; /* עיגול פינות עדין */
+    box-decoration-break: clone; /* חשוב: גורם לרקע להמשיך גם בשבירת שורות */
+    -webkit-box-decoration-break: clone;
+  }
+  
+  /* התאמה לשדה העריכה כדי שיציג נכון את הרקע */
+  .editing-mode textarea {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    padding: 15px;
+    min-height: 150px;
+    direction: rtl;
+  }
+  
   /* כפתור שמירה */
   .save-note-button {
     width: 24px;

@@ -13,16 +13,17 @@ const COLORS = [
 ];
 
 const BG_COLORS = [
-  "#FFF475", // Yellow
-  "#FFD6A5", // Orange
-  "#FDFFB6", // Light Yellow
-  "#CAFFBF", // Green
-  "#9BF6FF", // Blue
-  "#A0C4FF", // Light Blue
-  "#BDB2FF", // Purple
-  "#FFC6FF", // Pink
-  "#FFFFFF", // White
-  "#E0E0E0", // Gray
+  "#FF1744", // Red
+  "#FFD600", // Yellow
+  "#00E676", // Green
+  "#2979FF", // Blue
+  "#AA00FF", // Purple
+  "#FF9100", // Orange
+  "#FFC107", // Amber
+  "#FF5722", // Deep Orange
+  "#E91E63", // Pink
+  "#9C27B0", // Purple
+  "#FFFFFF", // White - שקוף (ללא רקע)
 ];
 
 const ColorsBox = ({ onColorChange, onBgColorChange, selectedTextColor, selectedBgColor }) => {
@@ -48,17 +49,20 @@ const ColorsBox = ({ onColorChange, onBgColorChange, selectedTextColor, selected
     }
   };
 
-  // טיפול בשינוי צבע רקע
+  // טיפול בשינוי צבע רקע לטקסט (מדגיש את הטקסט)
   const handleBgColorClick = (color) => {
-    setActiveBgColor(color);
+    // אם לוחצים על לבן, מבטלים את הרקע
+    const selectedColor = color === "#FFFFFF" ? "" : color;
+    
+    setActiveBgColor(selectedColor);
     if (onBgColorChange) {
-      onBgColorChange(color);
+      onBgColorChange(selectedColor);
     }
   };
 
   return (
     <div className="colors-box">
-      <h3>Text Color:</h3>
+      <h3>צבע טקסט:</h3>
       <div className="colors-options">
         {COLORS.map((color) => (
           <div
@@ -70,7 +74,7 @@ const ColorsBox = ({ onColorChange, onBgColorChange, selectedTextColor, selected
           />
         ))}
       </div>
-      <h3>Background Color:</h3>
+      <h3>הדגשת טקסט:</h3>
       <div className="colors-options">
         {BG_COLORS.map((color) => (
           <div
@@ -78,7 +82,7 @@ const ColorsBox = ({ onColorChange, onBgColorChange, selectedTextColor, selected
             className={`color-item ${color === activeBgColor ? 'active' : ''}`}
             style={{ backgroundColor: color }}
             onClick={() => handleBgColorClick(color)}
-            title={color}
+            title={color === "#FFFFFF" ? "ללא הדגשה" : color}
           />
         ))}
       </div>

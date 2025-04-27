@@ -15,7 +15,7 @@ const StickyNote = ({
   onSelect, 
   onEditEnd, 
   onSaveNote,
-  onSaveClick, // prop חדש
+  onSaveClick, 
   onSaveDialogOpen,
   onSaveDialogClose,
   username,
@@ -125,22 +125,61 @@ const StickyNote = ({
   };
   
   const renderTextWithCursor = () => {
-    if (!isSelected || isEditing) return text;
+    if (!isSelected || isEditing) {
+      // רנדור רגיל של טקסט עם רקע צבעוני אם הוגדר
+      if (backgroundColor) {
+        return (
+          <span 
+            className="text-with-background" 
+            style={{
+              backgroundColor: backgroundColor,
+              color: textColor // חשוב - צבע הטקסט מועבר כאן
+            }}
+          >
+            {text}
+          </span>
+        );
+      }
+      // רנדור טקסט רגיל ללא רקע אבל עם צבע טקסט
+      return (
+        <span style={{ color: textColor }}>
+          {text}
+        </span>
+      );
+    }
+    
+    // רנדור טקסט עם סמן
+    if (backgroundColor) {
+      return (
+        <>
+          <span 
+            className="text-with-background" 
+            style={{
+              backgroundColor: backgroundColor,
+              color: textColor
+            }}
+          >
+            {text}
+          </span>
+          <span className="cursor" style={{ backgroundColor: textColor }}></span>
+        </>
+      );
+    }
     
     return (
       <>
-        {text}
-        <span className="cursor"></span>
+        <span style={{ color: textColor }}>
+          {text}
+        </span>
+        <span className="cursor" style={{ backgroundColor: textColor }}></span>
       </>
     );
   };
 
-  // יצירת סגנון עבור תוכן הפתק, כולל פונט, גודל פונט, צבע טקסט וצבע רקע
+  // יצירת סגנון עבור תוכן הפתק, כולל פונט וגודל פונט
   const noteContentStyle = {
     fontFamily: fontFamily,
     fontSize: `${fontSize}px`,
-    color: textColor,
-    backgroundColor: backgroundColor || undefined
   };
 
   return (
@@ -154,7 +193,11 @@ const StickyNote = ({
           <textarea
             ref={textareaRef}
             value={text}
-            style={noteContentStyle} // הוספת סגנון לאזור העריכה
+            style={{
+              ...noteContentStyle,
+              color: textColor,
+              backgroundColor: backgroundColor || 'transparent'
+            }}
             onChange={(e) => {
               setText(e.target.value);
               onUpdate?.(id, { 
@@ -183,7 +226,7 @@ const StickyNote = ({
         </div>
       ) : (
         <>
-          <div className="note-content" style={noteContentStyle}>
+          <div className="note-content-wrapper" style={noteContentStyle}>
             {renderTextWithCursor()}
           </div>
           <div className="note-buttons">
