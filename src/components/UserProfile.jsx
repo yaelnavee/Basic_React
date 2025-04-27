@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import defaultAvatar from "/avatar.png";
-import "./UserProfile.css"; // <-- Add this line
+import "./UserProfile.css";
 
 function UserProfile({ username, onLogout, userImage, onImageChange }) {
-  const [fileInput, setFileInput] = useState(null);
+  // Using useRef instead of state for file input to prevent re-renders
+  const fileInputRef = useRef(null);
 
   const handleImageClick = () => {
-    if (fileInput) {
-      fileInput.click();
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
@@ -36,7 +37,7 @@ function UserProfile({ username, onLogout, userImage, onImageChange }) {
           type="file"
           accept="image/*"
           style={{ display: "none" }}
-          ref={el => setFileInput(el)}
+          ref={fileInputRef}
           onChange={handleFileChange}
         />
       </div>

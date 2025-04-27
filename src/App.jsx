@@ -23,6 +23,11 @@ function App() {
   
   // מצב דיאלוגים
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  
+  // מצב דיאלוג שמירה גלובלי
+  const [showGlobalSaveDialog, setShowGlobalSaveDialog] = useState(false);
+  const [saveFileName, setSaveFileName] = useState('');
+  const [saveNoteData, setSaveNoteData] = useState(null);
 
   // שימוש במנהל הפתקים
   const {
@@ -52,10 +57,83 @@ function App() {
     return notes.find(note => note.id === selectedNoteId) || null;
   };
 
-  const handleVirtualKeyPress = (key) => {
-    if (isSaveDialogOpen) return;
+  // פונקציות לניהול דיאלוג שמירה גלובלי
+  const openSaveDialog = (noteData) => {
+    // הכן שם קובץ ברירת מחדל
+    const defaultName = noteData.text 
+      ? noteData.text.trim().split(/\s+/).slice(0, 3).join('_') || `note_${noteData.id}`
+      : `note_${noteData.id}`;
     
-    if (selectedNoteId !== null) {
+    setSaveFileName(defaultName);
+    setSaveNoteData(noteData);
+    setShowGlobalSaveDialog(true);
+  };
+
+  const closeSaveDialog = () => {
+    setShowGlobalSaveDialog(false);
+    setSaveFileName('');
+    setSaveNoteData(null);
+  };
+
+  const handleSaveNote = () => {
+    if (saveNoteData && saveFileName.trim()) {
+      saveNoteToFile(saveFileName, saveNoteData);
+      closeSaveDialog();
+    }
+  };
+
+  // רינדור דיאלוג השמירה הגלובלי
+  const renderSaveDialog = () => {
+    if (!showGlobalSaveDialog) return null;
+
+    return (
+      <div className="global-save-dialog-overlay" onClick={closeSaveDialog}>
+        <div className="global-save-dialog" onClick={(e) => e.stopPropagation()}>
+          <h3>שמירת פתק</h3>
+          <input
+            type="text"
+            value={saveFileName}
+            onChange={(e) => setSaveFileName(e.target.value)}
+            placeholder="הזן שם לקובץ"
+            autoFocus
+          />
+          <div className="dialog-buttons">
+            <button onClick={handleSaveNote} className="save-button">שמור</button>
+            <button onClick={closeSaveDialog} className="cancel-button">ביטול</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // טיפול בלחיצה על מקש במקלדת הווירטואלית
+  const handleVirtualKeyPress = (key) => {
+    // אם דיאלוג השמירה פתוח, טפל בשדה שם הקובץ
+    if (showGlobalSaveDialog) {
+      switch (key) {
+        case 'Del':
+          setSaveFileName(prev => prev.slice(0, -1));
+          break;
+        case 'DelWord':
+          const words = saveFileName.trim().split(/\s+/);
+          words.pop();
+          setSaveFileName(words.join(' '));
+          break;
+        case 'Enter':
+          handleSaveNote();
+          break;
+        case 'Space':
+          setSaveFileName(prev => prev + ' ');
+          break;
+        default:
+          if (key.length === 1) {
+            setSaveFileName(prev => prev + key);
+          }
+          break;
+      }
+    } 
+    // אחרת, טפל בטקסט הפתק הרגיל
+    else if (selectedNoteId !== null) {
       updateSelectedNoteText(key);
     }
   };
@@ -93,9 +171,9 @@ function App() {
       console.log(`Changed text color to ${color} for note ${selectedNoteId}`);
       // סימון הפתק כעודכן לאחרונה
       setLastUpdatedId(selectedNoteId);
-  }   else {
+    } else {
       console.log("No note selected for text color change");
-    } 
+    }
   };
 
   // פונקציה לטיפול בשינוי צבע הרקע
@@ -134,8 +212,20 @@ function App() {
   // רישום למקלדת פיזית
   if (typeof document !== 'undefined') {
     document.onkeydown = (event) => {
-      if (isSaveDialogOpen) return;
+      // אם דיאלוג השמירה הגלובלי פתוח, טפל בלחיצת מקשים
+      if (showGlobalSaveDialog) {
+        if (event.key === 'Enter') {
+          handleSaveNote();
+          event.preventDefault();
+        } else if (event.key === 'Escape') {
+          closeSaveDialog();
+          event.preventDefault();
+        }
+        // לשאר המקשים, נאפשר התנהגות רגילה באינפוט
+        return;
+      }
       
+      // אחרת, נעביר את המקש לפתק
       if (selectedNoteId !== null) {
         updateSelectedNoteText(event.key);
       }
@@ -143,7 +233,7 @@ function App() {
   }
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${showGlobalSaveDialog ? 'keyboard-save-mode' : ''}`}>
       {isAuthenticated ? (
         <>
           <div className="grid-container">
@@ -160,7 +250,7 @@ function App() {
                 
                 <div className="add-note-container">
                   <button onClick={addNote} className="add-note-button">
-                    + add new note
+                    + הוסף פתק חדש
                   </button>
                 </div>
                 
@@ -179,32 +269,28 @@ function App() {
               <div className="notes-display-area">
                 {notes.map(note => (
                   <StickyNote 
-                  key={note.id}
-                  id={note.id}
-                  initialText={note.text}
-                  initialColor={note.color}
-                  initialFontFamily={note.fontFamily}
-                  initialFontSize={note.fontSize}
-                  initialTextColor={note.textColor}       
-                  initialBackgroundColor={note.backgroundColor} 
-                  onDelete={deleteNote}
-                  onUpdate={updateNote}
-                  onEditEnd={() => handleNoteEditEnd(note.id)}
-                  isSelected={note.id === selectedNoteId}
-                  onSelect={(id) => {
-                    if (id === null) {
-                      setIsSaveDialogOpen(true);
-                    } else {
-                      setIsSaveDialogOpen(false);
+                    key={note.id}
+                    id={note.id}
+                    initialText={note.text}
+                    initialColor={note.color}
+                    initialFontFamily={note.fontFamily}
+                    initialFontSize={note.fontSize}
+                    initialTextColor={note.textColor}       
+                    initialBackgroundColor={note.backgroundColor} 
+                    onDelete={deleteNote}
+                    onUpdate={updateNote}
+                    onEditEnd={() => handleNoteEditEnd(note.id)}
+                    isSelected={note.id === selectedNoteId}
+                    onSelect={(id) => {
                       selectNote(id);
-                    }
-                  }}
-                  onSaveNote={saveNoteToFile}
-                  onSaveDialogOpen={() => setIsSaveDialogOpen(true)}
-                  onSaveDialogClose={() => setIsSaveDialogOpen(false)}
-                  username={username}  
-                  notes={notes}               
-                />
+                    }}
+                    onSaveNote={saveNoteToFile}
+                    onSaveDialogOpen={() => setIsSaveDialogOpen(true)}
+                    onSaveDialogClose={() => setIsSaveDialogOpen(false)}
+                    onSaveClick={(note) => openSaveDialog(note)}
+                    username={username}  
+                    notes={notes}               
+                  />
                 ))}
               </div>
             </div>
@@ -226,6 +312,9 @@ function App() {
               />
             </div>
           </div>
+          
+          {/* Global Save Dialog */}
+          {renderSaveDialog()}
         </>
       ) : (
         <div style={{ textAlign: "center", paddingTop: "50px" }}>
